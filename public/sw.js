@@ -1,4 +1,4 @@
-const CACHE = 'withyou-v1';
+ const CACHE = 'withyou-v1';
 const URLS = ['/', '/css/style.css', '/manifest.json'];
 
 self.addEventListener('install', e => {
