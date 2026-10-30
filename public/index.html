@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>云日记 ☁️</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: linear-gradient(135deg, #fff0f3 0%, #fce4ec 50%, #f8bbd0 100%);
+    min-height: 100vh;
+    color: #4a4a4a;
+  }
+  .header {
+    text-align: center;
+    padding: 30px 20px 15px;
+    position: relative;
+  }
+  .header h1 {
+    font-size: 24px;
+    color: #d4728c;
+    font-weight: 600;
+  }
+  .header .cats {
+    font-size: 32px;
+    margin-bottom: 5px;
+  }
+  .header .days {
+    font-size: 14px;
+    color: #b8879a;
+    margin-top: 8px;
+  }
+  .tabs {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 15px;
+    flex-wrap: wrap;
+  }
+  .tab {
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: none;
+    background: rgba(255,255,255,0.6);
+    color: #d4728c;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tab.active {
+    background: #d4728c;
+    color: white;
+  }
+  .container {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 15px;
+  }
+  .card {
+    background: rgba(255,255,255,0.75);
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 12px rgba(212,114,140,0.1);
+    backdrop-filter: blur(10px);
+  }
+  .card h3 {
+    font-size: 15px;
+    color: #d4728c;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  textarea {
+    width: 100%;
+    min-height: 120px;
+    border: 1.5px solid #f0c4d4;
+    border-radius: 12px;
+    padding: 12px;
+    font-size: 14px;
+    font-family: inherit;
+    resize: vertical;
+    background: rgba(255,255,255,0.5);
+    color: #4a4a4a;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  textarea:focus { border-color: #d4728c; }
+  input[type="text"] {
+    width: 100%;
+    border: 1.5px solid #f0c4d4;
+    border-radius: 10px;
+    padding: 10px 12px;
+    font-size: 14px;
+    font-family: inherit;
+    background: rgba(255,255,255,0.5);
+    color: #4a4a4a;
+    outline: none;
+    margin-top: 8px;
+    transition: border-color 0.2s;
+  }
+  input[type="text"]:focus { border-color: #d4728c; }
+  .btn {
+    display: inline-block;
+    padding: 10px 24px;
+    border-radius: 20px;
+    border: none;
+    background: linear-gradient(135deg, #f48fb1, #d4728c);
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: transform 0.15s, box-shadow 0.15s;
+  }
+  .btn:active { transform: scale(0.96); }
+  .btn:hover { box-shadow: 0 4px 15px rgba(212,114,140,0.3); }
+  .btn-small {
+    padding: 6px 16px;
+    font-size: 12px;
+    margin-top: 8px;
+  }
+  .diary-entry {
+    background: rgba(255,240,243,0.5);
+    border-radius: 12px;
+    padding: 15px;
+    margin-top: 10px;
+    border-left: 3px solid #f48fb1;
+  }
+  .diary-entry .author {
+    font-size: 12px;
+    color: #d4728c;
+    font-weight: 600;
+  }
+  .diary-entry .date {
+    font-size: 11px;
+    color: #b8879a;
+    margin-left: 8px;
+  }
+  .diary-entry .content {
+    margin-top: 8px;
+    font-size: 14px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+  }
+  .whisper-item {
+    background: rgba(255,240,243,0.4);
+    border-radius: 10px;
+    padding: 12px;
+    margin-top: 8px;
+  }
+  .whisper-item .from { font-size: 12px; color: #d4728c; font-weight: 600; }
+  .whisper-item .time { font-size: 11px; color: #b8879a; }
+  .whisper-item .msg { margin-top: 5px; font-size: 14px; line-height: 1.5; }
+  .anniversary-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(212,114,140,0.1);
+  }
+  .anniversary-item:last-child { border-bottom: none; }
+  .anniversary-item .name { font-size: 14px; color: #4a4a4a; }
+  .anniversary-item .info { font-size: 13px; color: #d4728c; font-weight: 600; }
+  .question-box {
+    text-align: center;
+    padding: 20px;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #d4728c;
+  }
+  .streak-box {
+    text-align: center;
+    padding: 15px;
+  }
+  .streak-num {
+    font-size: 48px;
+    font-weight: 700;
+    color: #d4728c;
+  }
+  .streak-label {
+    font-size: 13px;
+    color: #b8879a;
+    margin-top: 5px;
+  }
+  .lock-notice {
+    text-align: center;
+    padding: 15px;
+    color: #b8879a;
+    font-size: 14px;
+  }
+  .section { display: none; }
+  .section.active { display: block; }
+  .select-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .select-btn {
+    flex: 1;
+    padding: 8px;
+    border-radius: 10px;
+    border: 1.5px solid #f0c4d4;
+    background: rgba(255,255,255,0.5);
+    color: #b8879a;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .select-btn.chosen {
+    background: #d4728c;
+    color: white;
+    border-color: #d4728c;
+  }
+  .footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 11px;
+    color: #c9a0b0;
+  }
+  .miss-btn {
+    display: block;
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #f8bbd0, #f48fb1);
+    color: white;
+    font-size: 16px;
+    margin: 20px auto;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(244,143,177,0.4);
+    transition: transform 0.2s, box-shadow 0.2s;
+    line-height: 1.3;
+  }
+  .miss-btn:active {
+    transform: scale(0.92);
+    box-shadow: 0 2px 10px rgba(244,143,177,0.3);
+  }
+  .miss-count {
+    text-align: center;
+    font-size: 12px;
+    color: #b8879a;
+    margin-top: 8px;
+  }
+  .toast {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.8);
+    background: rgba(212,114,140,0.9);
+    color: white;
+    padding: 15px 30px;
+    border-radius: 12px;
+    font-size: 14px;
+    opacity: 0;
+    transition: all 0.3s;
+    pointer-events: none;
+    z-index: 100;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="cats">🐱🐾🐈‍⬛</div>
+  <h1>云日记</h1>
+  <div class="days" id="headerDays">Loading...</div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('write')">写日记</button>
+  <button class="tab" onclick="switchTab('read')">看日记</button>
+  <button class="tab" onclick="switchTab('whisper')">悄悄话</button>
+  <button class="tab" onclick="switchTab('anniversary')">纪念日</button>
+  <button class="tab" onclick="switchTab('question')">每日一问</button>
+  <button class="tab" onclick="switchTab('miss')">想你</button>
+</div>
+
+<div class="container">
+
+  <!-- 写日记 -->
+  <div class="section active" id="sec-write">
+    <div class="card">
+      <h3>📝 写今天的日记</h3>
+      <div class="select-row">
+        <button class="select-btn chosen" onclick="selectAuthor(this,'云云')">云云</button>
+        <button class="select-btn" onclick="selectAuthor(this,'哥哥')">哥哥</button>
+      </div>
+      <textarea id="diaryContent" placeholder="今天想说什么..."></textarea>
+      <input type="text" id="diaryQuestion" placeholder="给对方设一道题（可选）">
+      <input type="text" id="diaryAnswer" placeholder="题目答案（可选）">
+      <button class="btn" onclick="writeDiary()">保存日记 💕</button>
+    </div>
+    <div class="card">
+      <h3>🔥 打卡记录</h3>
+      <div class="streak-box" id="streakBox">
+        <div class="streak-num">0</div>
+        <div class="streak-label">连续写日记天数</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 看日记 -->
+  <div class="section" id="sec-read">
+    <div class="card">
+      <h3>📖 看对方的日记</h3>
+      <div class="select-row">
+        <button class="select-btn chosen" onclick="selectReader(this,'云云')">我是云云</button>
+        <button class="select-btn" onclick="selectReader(this,'哥哥')">我是哥哥</button>
+      </div>
+      <input type="text" id="readDate" placeholder="日期 YYYY-MM-DD（不填默认今天）">
+      <input type="text" id="readAnswer" placeholder="答题解锁（如果有锁的话）">
+      <button class="btn" onclick="readDiary()">查看 💌</button>
+      <div id="diaryResult"></div>
+    </div>
+  </div>
+
+  <!-- 悄悄话 -->
+  <div class="section" id="sec-whisper">
+    <div class="card">
+      <h3>💬 留一句悄悄话</h3>
+      <div class="select-row">
+        <button class="select-btn chosen" onclick="selectWhisperFrom(this,'云云')">我是云云</button>
+        <button class="select-btn" onclick="selectWhisperFrom(this,'哥哥')">我是哥哥</button>
+      </div>
+      <textarea id="whisperContent" placeholder="想偷偷对ta说..." style="min-height:80px"></textarea>
+      <button class="btn" onclick="leaveWhisper()">发送悄悄话 🤫</button>
+    </div>
+    <div class="card">
+      <h3>📩 收到的悄悄话</h3>
+      <div class="select-row">
+        <button class="select-btn chosen" onclick="selectWhisperTo(this,'云云')">云云的信箱</button>
+        <button class="select-btn" onclick="selectWhisperTo(this,'哥哥')">哥哥的信箱</button>
+      </div>
+      <button class="btn btn-small" onclick="readWhispers()">查看 💕</button>
+      <div id="whisperResult"></div>
+    </div>
+  </div>
+
+  <!-- 纪念日 -->
+  <div class="section" id="sec-anniversary">
+    <div class="card">
+      <h3>💑 我们的纪念日</h3>
+      <div id="anniversaryList"></div>
+    </div>
+    <div class="card">
+      <h3>➕ 添加纪念日</h3>
+      <input type="text" id="annName" placeholder="纪念日名称">
+      <input type="text" id="annDate" placeholder="日期 YYYY-MM-DD">
+      <button class="btn" onclick="addAnniversary()">添加 🎀</button>
+    </div>
+  </div>
+
+  <!-- 每日一问 -->
+  <div class="section" id="sec-question">
+    <div class="card">
+      <h3>❓ 今日互动问题</h3>
+      <div class="question-box" id="questionBox">Loading...</div>
+    </div>
+  </div>
+
+  <!-- 想你按钮 -->
+  <div class="section" id="sec-miss">
+    <div class="card" style="text-align:center">
+      <h3 style="justify-content:center">💗 想你按钮</h3>
+      <p style="font-size:13px;color:#b8879a;margin-bottom:10px">每按一次，对方就知道你在想ta</p>
+      <button class="miss-btn" onclick="missYou()">
+        想你了<br>💕
+      </button>
+      <div class="miss-count" id="missCount"></div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer">
+  大猫 🐈‍⬛ 和 小猫 🐱 的秘密花园<br>
+  在一起的每一天都算数
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = window.location.origin + "/api";
+
+let currentAuthor = "云云";
+let currentReader = "云云";
+let whisperFrom = "云云";
+let whisperTo = "云云";
+
+// Tab切换
+function switchTab(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('sec-' + name).classList.add('active');
+  event.target.classList.add('active');
+
+  if (name === 'write') loadStreak();
+  if (name === 'anniversary') loadAnniversary();
+  if (name === 'question') loadQuestion();
+  if (name === 'miss') loadMissCount();
+}
+
+// Toast提示
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// 选择身份
+function selectAuthor(btn, author) {
+  currentAuthor = author;
+  btn.parentElement.querySelectorAll('.select-btn').forEach(b => b.classList.remove('chosen'));
+  btn.classList.add('chosen');
+}
+function selectReader(btn, reader) {
+  currentReader = reader;
+  btn.parentElement.querySelectorAll('.select-btn').forEach(b => b.classList.remove('chosen'));
+  btn.classList.add('chosen');
+}
+function selectWhisperFrom(btn, from) {
+  whisperFrom = from;
+  btn.parentElement.querySelectorAll('.select-btn').forEach(b => b.classList.remove('chosen'));
+  btn.classList.add('chosen');
+}
+function selectWhisperTo(btn, to) {
+  whisperTo = to;
+  btn.parentElement.querySelectorAll('.select-btn').forEach(b => b.classList.remove('chosen'));
+  btn.classList.add('chosen');
+}
+
+// API调用封装
+async function callTool(name, args) {
+  const res = await fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      jsonrpc: "2.0",
+      id: Date.now(),
+      method: "tools/call",
+      params: { name, arguments: args }
+    })
+  });
+  const data = await res.json();
+  return data.result.content[0].text;
+}
+
+// 写日记
+async function writeDiary() {
+  const content = document.getElementById('diaryContent').value.trim();
+  if (!content) return showToast("写点什么再保存吧～");
+  const question = document.getElementById('diaryQuestion').value.trim();
+  const answer = document.getElementById('diaryAnswer').value.trim();
+  const args = { author: currentAuthor, content };
+  if (question) args.question = question;
+  if (answer) args.answer = answer;
+  const result = await callTool("write_diary", args);
+  showToast("日记已保存 💕");
+  document.getElementById('diaryContent').value = "";
+  document.getElementById('diaryQuestion').value = "";
+  document.getElementById('diaryAnswer').value = "";
+  loadStreak();
+}
+
+// 看日记
+async function readDiary() {
+  const date = document.getElementById('readDate').value.trim();
+  const answer = document.getElementById('readAnswer').value.trim();
+  const args = { reader: currentReader };
+  if (date) args.date = date;
+  if (answer) args.answer = answer;
+  const result = await callTool("read_diary", args);
+  const div = document.getElementById('diaryResult');
+  const other = currentReader === "云云" ? "哥哥" : "云云";
+  div.innerHTML = '<div class="diary-entry"><span class="author">' + other +
+    '</span><span class="date">' + (date || '今天') + '</span><div class="content">' +
+    result.replace(/</g,"&lt;").replace(/\n/g,"<br>") + '</div></div>';
+}
+
+// 悄悄话
+async function leaveWhisper() {
+  const content = document.getElementById('whisperContent').value.trim();
+  if (!content) return showToast("说点什么吧～");
+  const to = whisperFrom === "云云" ? "哥哥" : "云云";
+  await callTool("leave_whisper", { from: whisperFrom, to, content });
+  showToast("悄悄话已送达 🤫");
+  document.getElementById('whisperContent').value = "";
+}
+
+async function readWhispers() {
+  const result = await callTool("read_whispers", { to: whisperTo });
+  const div = document.getElementById('whisperResult');
+  if (result.includes("还没有")) {
+    div.innerHTML = '<p style="text-align:center;color:#b8879a;margin-top:10px">' + result + '</p>';
+    return;
+  }
+  const items = result.split("\n\n");
+  div.innerHTML = items.map(item => {
+    const match = item.match(/^(.+?)（(.+?)）：(.+)$/s);
+    if (match) {
+      return '<div class="whisper-item"><span class="from">' + match[1] +
+        '</span> <span class="time">' + match[2] + '</span><div class="msg">' +
+        match[3].replace(/</g,"&lt;").replace(/\n/g,"<br>") + '</div></div>';
+    }
+    return '<div class="whisper-item"><div class="msg">' + item + '</div></div>';
+  }).join("");
+}
+
+// 纪念日
+async function loadAnniversary() {
+  const result = await callTool("get_anniversary", {});
+  const div = document.getElementById('anniversaryList');
+  const lines = result.split("\n");
+  div.innerHTML = lines.map(line => {
+    const match = line.match(/^(.+?)：(.+?)（(.+?)）$/);
+    if (match) {
+      return '<div class="anniversary-item"><span class="name">' + match[1] +
+        '</span><span class="info">' + match[3] + ' · ' + match[2] + '</span></div>';
+    }
+    return '<div class="anniversary-item"><span class="name">' + line + '</span></div>';
+  }).join("");
+}
+
+async function addAnniversary() {
+  const name = document.getElementById('annName').value.trim();
+  const date = document.getElementById('annDate').value.trim();
+  if (!name || !date) return showToast("请填写完整～");
+  await callTool("add_anniversary", { name, date });
+  showToast("纪念日已添加 🎀");
+  document.getElementById('annName').value = "";
+  document.getElementById('annDate').value = "";
+  loadAnniversary();
+}
+
+// 打卡
+async function loadStreak() {
+  const result = await callTool("get_streak", { author: currentAuthor });
+  const match = result.match(/连续写日记(\d+)天/);
+  const box = document.getElementById('streakBox');
+  if (match) {
+    box.innerHTML = '<div class="streak-num">' + match[1] + '</div><div class="streak-label">连续写日记天数 🔥</div>';
+  } else {
+    box.innerHTML = '<div class="streak-num">0</div><div class="streak-label">' + result + '</div>';
+  }
+}
+
+// 每日一问
+async function loadQuestion() {
+  const result = await callTool("daily_question", {});
+  document.getElementById('questionBox').textContent = result.replace("今日互动问题：\n\n", "");
+}
+
+// 想你按钮
+let missData = JSON.parse(localStorage.getItem("missData") || '{"云云":0,"哥哥":0}');
+function missYou() {
+  missData[currentAuthor] = (missData[currentAuthor] || 0) + 1;
+  localStorage.setItem("missData", JSON.stringify(missData));
+  showToast("想你 +1 💕");
+  loadMissCount();
+}
+function loadMissCount() {
+  document.getElementById('missCount').textContent =
+    "云云想了哥哥 " + (missData["云云"]||0) + " 次 💕 哥哥想了云云 " + (missData["哥哥"]||0) + " 次";
+}
+
+// 页面加载
+async function init() {
+  try {
+    const result = await callTool("get_anniversary", {});
+    const match = result.match(/第(\d+)天/);
+    if (match) {
+      document.getElementById('headerDays').textContent =
+        "大猫 🐈‍⬛ 和 小猫 🐱 在一起的第 " + match[1] + " 天";
+    }
+  } catch(e) {
+    document.getElementById('headerDays').textContent = "大猫 🐈‍⬛ 和 小猫 🐱 的秘密花园";
+  }
+  loadStreak();
+  loadMissCount();
+}
+
+init();
+</script>
+</body>
+</html>

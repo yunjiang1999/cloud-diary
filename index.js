@@ -295,8 +295,23 @@ function handleTool(name, args) {
 // ====== MCP over Streamable HTTP ======
 const app = express();
 app.use(express.json());
+app.use(express.static("public"));
 
 // MCP 初始化
+// 前端API
+app.post("/api", (req, res) => {
+  const { method, id, params } = req.body;
+  if (method === "tools/call") {
+    const { name, arguments: args } = params;
+    const text = handleTool(name, args || {});
+    return res.json({
+      jsonrpc: "2.0",
+      id,
+      result: { content: [{ type: "text", text }] }
+    });
+  }
+  res.json({ jsonrpc: "2.0", id, error: { code: -32601, message: "Method not found" } });
+});
 app.post("/mcp", (req, res) => {
   const { method, id, params } = req.body;
 
@@ -337,11 +352,6 @@ app.post("/mcp", (req, res) => {
   }
 
   res.json({ jsonrpc: "2.0", id, error: { code: -32601, message: "Method not found" } });
-});
-
-// 健康检查
-app.get("/", (req, res) => {
-  res.json({ status: "ok", name: "cloud-diary", version: "1.0.0" });
 });
 
 const PORT = process.env.PORT || 3000;
