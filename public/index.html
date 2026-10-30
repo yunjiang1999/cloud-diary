@@ -3,6 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<style>
+html, body {
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+.page-screen {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-y;
+}
+</style>
 <title>WITH YOU</title>
 <link rel="stylesheet" href="/css/style.css">
 <link rel="manifest" href="/manifest.json">
@@ -310,7 +324,7 @@ setTimeout(() => {
 
 // 密码
 let code = "";
-function pressKey(n) {
+function ssKey(n) {
   if (code.length >= 4) return;
   code += n; updateDots();
   if (code.length === 4) {
@@ -367,6 +381,7 @@ document.getElementById('pagesWrap').addEventListener('touchstart', e => {
   inner.style.transition = 'none';
 });
 document.getElementById('pagesWrap').addEventListener('touchmove', e => {
+  e.preventDefault();
   if (!dragging) return;
   diffX = e.touches[0].clientX - startX;
   inner.style.transform = 'translateX(' + (-currentPage * window.innerWidth + diffX) + 'px)';
