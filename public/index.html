@@ -278,6 +278,10 @@ document.getElementById('todayMood').addEventListener('click', function() {
   this.textContent = moods[moodIdx];
 });
 </script>
-
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
+</script>
 </body>
 </html>
