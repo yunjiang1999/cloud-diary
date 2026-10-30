@@ -8,30 +8,65 @@
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#efe4e9">
 <style>
-.pages-wrap{
-  overflow:hidden;position:relative;
-  touch-action:pan-y;
-}
-.pages-inner{
-  display:flex;transition:transform .35s ease;
-  will-change:transform;
-}
+.pages-wrap{overflow:hidden;position:relative;touch-action:pan-y}
+.pages-inner{display:flex;transition:transform .35s ease;will-change:transform}
 .page-screen{
   min-width:100vw;max-width:100vw;
   min-height:calc(100vh - 30px);
-  padding:20px 15px 10px;
-  box-sizing:border-box;
+  padding:15px 15px 10px;box-sizing:border-box;
 }
 .page-screen .home{max-width:420px;margin:0 auto}
-.dots{
-  display:flex;justify-content:center;gap:8px;
-  padding:10px 0 20px;
-}
-.dot{
-  width:6px;height:6px;border-radius:50%;
-  background:var(--border);transition:all .3s;
-}
+.dots{display:flex;justify-content:center;gap:8px;padding:8px 0 15px}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--border);transition:all .3s}
 .dot.active{background:var(--text);width:18px;border-radius:3px}
+
+/* 时间 */
+.time-widget{text-align:center;padding:10px 0 8px}
+.time-big{font-size:42px;font-weight:700;color:var(--text);letter-spacing:4px;line-height:1}
+.time-date{font-size:11px;color:var(--text-light);margin-top:6px;letter-spacing:2px}
+
+/* 心电波组件 */
+.heartbeat-card{
+  background:var(--glass2);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--glass-border);border-radius:20px;
+  padding:20px;margin-bottom:14px;box-shadow:0 2px 16px var(--shadow);
+  text-align:center;
+}
+.heartbeat-top{
+  display:flex;align-items:center;justify-content:center;gap:0;
+  margin-bottom:12px;position:relative;
+}
+.hb-avatar{
+  width:54px;height:54px;border-radius:50%;
+  border:2px solid white;background:var(--bg2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;overflow:hidden;position:relative;z-index:2;
+}
+.hb-avatar img{width:100%;height:100%;object-fit:cover}
+.hb-line-wrap{
+  width:80px;height:40px;overflow:hidden;position:relative;z-index:1;
+  margin:0 -6px;
+}
+.hb-line-wrap svg{width:100%;height:100%}
+.hb-line{
+  fill:none;stroke:var(--border);stroke-width:1.5;
+  stroke-dasharray:200;stroke-dashoffset:200;
+  animation:heartLine 2.5s ease-in-out infinite;
+}
+@keyframes heartLine{
+  0%{stroke-dashoffset:200}
+  50%{stroke-dashoffset:0}
+  100%{stroke-dashoffset:-200}
+}
+.hb-name{font-size:10px;color:var(--text-light);letter-spacing:1px;margin-top:2px}
+.hb-names{
+  display:flex;justify-content:space-between;
+  padding:0 20px;margin-bottom:10px;
+}
+.hb-quote{
+  font-size:11px;color:var(--text-light);font-style:italic;
+  letter-spacing:.5px;line-height:1.5;
+}
 </style>
 </head>
 <body>
@@ -82,6 +117,14 @@
       <!-- 第一页 -->
       <div class="page-screen">
         <div class="home">
+
+          <!-- 时间 -->
+          <div class="time-widget">
+            <div class="time-big" id="timeDisplay">00:00</div>
+            <div class="time-date" id="dateDisplay">loading...</div>
+          </div>
+
+          <!-- 资料卡 -->
           <div class="profile-card">
             <div class="profile-top">
               <div class="profile-avatars">
@@ -96,12 +139,31 @@
             <div class="profile-sig">我喜欢你正是因为我们有所不同</div>
           </div>
 
+          <!-- 心电波组件 -->
+          <div class="heartbeat-card">
+            <div class="hb-names">
+              <div class="hb-name">哥哥</div>
+              <div class="hb-name">云云</div>
+            </div>
+            <div class="heartbeat-top">
+              <div class="hb-avatar">🐈‍⬛</div>
+              <div class="hb-line-wrap">
+                <svg viewBox="0 0 80 40">
+                  <polyline class="hb-line" points="0,20 15,20 22,20 28,5 34,35 40,20 48,20 54,20 60,8 66,32 72,20 80,20"/>
+                </svg>
+              </div>
+              <div class="hb-avatar">🐱</div>
+            </div>
+            <div class="hb-quote" id="hbQuote"></div>
+          </div>
+
+          <!-- 双栏 -->
           <div class="row">
             <div class="col">
               <div class="widget" id="moodWidget">
                 <div class="widget-label">今日心情</div>
                 <div class="widget-value" id="todayMood">☁️</div>
-                <div class="widget-sub">点击记录心情</div>
+                <div class="widget-sub">点击切换</div>
               </div>
             </div>
             <div class="col">
@@ -112,11 +174,12 @@
             </div>
           </div>
 
+          <!-- 装饰图 -->
           <div class="deco-card">
             <img src="/icons/banner.jpg" onerror="this.style.display='none'" alt="">
-            <div class="overlay">WITH YOU · 我们的空间</div>
           </div>
 
+          <!-- 图标 -->
           <div class="app-grid">
             <a class="app-icon" href="/diary.html">
               <div class="app-icon-img">✎</div>
@@ -135,12 +198,20 @@
               <div class="app-icon-label">纪念日</div>
             </a>
           </div>
+
         </div>
       </div>
 
       <!-- 第二页 -->
       <div class="page-screen">
         <div class="home">
+
+          <!-- 装饰图 -->
+          <div class="deco-card" style="height:150px;margin-bottom:18px">
+            <img src="/icons/deco.jpg" onerror="this.style.display='none'" alt="">
+          </div>
+
+          <!-- 图标 -->
           <div class="app-grid">
             <a class="app-icon" href="/question.html">
               <div class="app-icon-img">？</div>
@@ -164,19 +235,13 @@
             </a>
           </div>
 
-          <div class="deco-card" style="height:160px;margin-top:14px">
-            <img src="/icons/deco.jpg" onerror="this.style.display='none'" alt="">
-            <div class="overlay">在一起的每一天都算数</div>
-          </div>
-
           <div class="footer">WITH YOU</div>
+
         </div>
       </div>
 
     </div>
   </div>
-
-  <!-- 页面指示器 -->
   <div class="dots" id="dots">
     <div class="dot active"></div>
     <div class="dot"></div>
@@ -211,8 +276,17 @@ const QUOTES = [
   "你笑起来的样子，是我见过最好的天气。",
   "如果可以，我想把所有温柔都给你。"
 ];
+const HB_QUOTES = [
+  "两颗心，同一个频率。",
+  "你的心跳，是我听过最好的音乐。",
+  "距离是假的，心跳是真的。",
+  "不同的地方，同一个节拍。",
+  "每一次跳动，都在说想你。",
+  "隔着屏幕，心跳也能同步。",
+  "你在那边，我在这边，中间是心跳的声音。"
+];
 
-// 开屏标题
+// 开屏
 const titleEl = document.getElementById('splashTitle');
 TITLE_TEXT.split('').forEach((ch, i) => {
   const s = document.createElement('span');
@@ -222,6 +296,8 @@ TITLE_TEXT.split('').forEach((ch, i) => {
 });
 document.getElementById('splashQuote').textContent =
   QUOTES[Math.floor(Math.random() * QUOTES.length)];
+document.getElementById('hbQuote').textContent =
+  HB_QUOTES[Math.floor(Math.random() * HB_QUOTES.length)];
 
 setTimeout(() => {
   document.getElementById('splash').classList.add('fade-out');
@@ -261,34 +337,42 @@ function updateDots() {
     d.classList.toggle('filled', i < code.length));
 }
 
-// 滑动翻页
-let currentPage = 0;
-const totalPages = 2;
-let startX = 0, diffX = 0, dragging = false;
+// 时间
+function updateTime() {
+  const now = new Date();
+  const h = String(now.getHours()).padStart(2, '0');
+  const m = String(now.getMinutes()).padStart(2, '0');
+  document.getElementById('timeDisplay').textContent = h + ':' + m;
+  const days = ['日', '一', '二', '三', '四', '五', '六'];
+  const month = now.getMonth() + 1;
+  const date = now.getDate();
+  document.getElementById('dateDisplay').textContent =
+    month + '月' + date + '日  星期' + days[now.getDay()];
+}
+updateTime();
+setInterval(updateTime, 10000);
+
+// 滑动
+let currentPage = 0, totalPages = 2, startX = 0, diffX = 0, dragging = false;
 const inner = document.getElementById('pagesInner');
 const dotsEl = document.getElementById('dots');
-
 function goPage(p) {
   currentPage = Math.max(0, Math.min(p, totalPages - 1));
   inner.style.transform = 'translateX(' + (-currentPage * 100) + 'vw)';
   dotsEl.querySelectorAll('.dot').forEach((d, i) =>
     d.classList.toggle('active', i === currentPage));
 }
-
 document.getElementById('pagesWrap').addEventListener('touchstart', e => {
-  startX = e.touches[0].clientX;
-  diffX = 0; dragging = true;
+  startX = e.touches[0].clientX; diffX = 0; dragging = true;
   inner.style.transition = 'none';
 });
 document.getElementById('pagesWrap').addEventListener('touchmove', e => {
   if (!dragging) return;
   diffX = e.touches[0].clientX - startX;
-  const offset = -currentPage * window.innerWidth + diffX;
-  inner.style.transform = 'translateX(' + offset + 'px)';
+  inner.style.transform = 'translateX(' + (-currentPage * window.innerWidth + diffX) + 'px)';
 });
 document.getElementById('pagesWrap').addEventListener('touchend', () => {
-  dragging = false;
-  inner.style.transition = 'transform .35s ease';
+  dragging = false; inner.style.transition = 'transform .35s ease';
   if (diffX < -50) goPage(currentPage + 1);
   else if (diffX > 50) goPage(currentPage - 1);
   else goPage(currentPage);
