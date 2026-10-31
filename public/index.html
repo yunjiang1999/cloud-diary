@@ -35,35 +35,43 @@ html, body {
 .dot.active{background:var(--text);width:18px;border-radius:3px}
 
 /* 时间 */
-.time-widget{text-align:center;padding:10px 0 8px}
-.time-big{font-size:42px;font-weight:700;color:var(--text);letter-spacing:4px;line-height:1}
-.time-date{font-size:11px;color:var(--text-light);margin-top:6px;letter-spacing:2px}
+.time-widget{text-align:center;padding:6px 0 4px}
+.time-big{font-size:38px;font-weight:700;color:rgba(95,95,95,0.45);letter-spacing:8px;line-height:1}
+.time-date{font-size:10px;color:var(--text-light);margin-top:6px;letter-spacing:3px;opacity:0.7}
 
-/* 心电波组件 */
-.heartbeat-card{
-  background:var(--glass2);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border:1px solid var(--glass-border);border-radius:20px;
-  padding:20px;margin-bottom:14px;box-shadow:0 2px 16px var(--shadow);
-  text-align:center;
+/* 主视觉卡片 */
+.hero-card{
+  background:var(--glass2);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--glass-border);border-radius:24px;
+  padding:28px 20px 24px;margin-bottom:14px;
+  box-shadow:0 4px 24px var(--shadow),inset 0 1px 0 rgba(255,255,255,0.5);
+  text-align:center;position:relative;overflow:hidden;
 }
-.heartbeat-top{
+.hero-card::before{
+  content:"";position:absolute;top:-40%;left:-40%;
+  width:180%;height:180%;
+  background:radial-gradient(ellipse at 35% 25%,rgba(255,255,255,0.18),transparent 60%);
+  pointer-events:none;
+}
+.hero-avatars{
   display:flex;align-items:center;justify-content:center;gap:0;
-  margin-bottom:12px;position:relative;
+  margin-bottom:16px;position:relative;z-index:1;
 }
-.hb-avatar{
-  width:54px;height:54px;border-radius:50%;
-  border:2px solid white;background:var(--bg2);
+.hero-avatar{
+  width:68px;height:68px;border-radius:50%;
+  border:2.5px solid rgba(255,255,255,0.7);background:var(--bg2);
   display:flex;align-items:center;justify-content:center;
-  font-size:24px;overflow:hidden;position:relative;z-index:2;
+  font-size:28px;overflow:hidden;
+  box-shadow:0 3px 12px rgba(162,161,164,0.15);
 }
-.hb-avatar img{width:100%;height:100%;object-fit:cover}
-.hb-line-wrap{
-  width:80px;height:40px;overflow:hidden;position:relative;z-index:1;
-  margin:0 -6px;
+.hero-avatar img{width:100%;height:100%;object-fit:cover}
+.hero-link{
+  width:50px;height:30px;overflow:hidden;position:relative;
+  margin:0 -8px;z-index:1;
 }
-.hb-line-wrap svg{width:100%;height:100%}
-.hb-line{
-  fill:none;stroke:var(--border);stroke-width:1.5;
+.hero-link svg{width:100%;height:100%}
+.hero-link .hb-line{
+  fill:none;stroke:rgba(189,187,191,0.5);stroke-width:1.2;
   stroke-dasharray:200;stroke-dashoffset:200;
   animation:heartLine 2.5s ease-in-out infinite;
 }
@@ -72,15 +80,135 @@ html, body {
   50%{stroke-dashoffset:0}
   100%{stroke-dashoffset:-200}
 }
-.hb-name{font-size:10px;color:var(--text-light);letter-spacing:1px;margin-top:2px}
-.hb-names{
-  display:flex;justify-content:space-between;
-  padding:0 20px;margin-bottom:10px;
+.hero-names{
+  font-size:14px;color:var(--text);font-weight:600;
+  letter-spacing:3px;margin-bottom:6px;position:relative;z-index:1;
 }
-.hb-quote{
+.hero-names .heart{
+  display:inline-block;font-style:normal;font-weight:400;
+  color:var(--text-light);font-size:12px;margin:0 6px;
+}
+.hero-days{
+  font-size:32px;font-weight:700;color:var(--text);
+  letter-spacing:2px;line-height:1.2;margin:10px 0 4px;
+  position:relative;z-index:1;
+}
+.hero-days-label{
+  font-size:10px;color:var(--text-light);letter-spacing:2px;
+  position:relative;z-index:1;
+}
+.hero-sig{
   font-size:11px;color:var(--text-light);font-style:italic;
-  letter-spacing:.5px;line-height:1.5;
+  letter-spacing:1px;line-height:1.6;
+  margin-top:14px;padding-top:12px;
+  border-top:1px dashed rgba(189,187,191,0.25);
+  position:relative;z-index:1;
 }
+
+/* 情话卡片 */
+.quote-card{
+  background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--glass-border);border-radius:18px;
+  padding:18px 20px;margin-bottom:14px;
+  box-shadow:0 2px 16px var(--shadow),inset 0 1px 0 rgba(255,255,255,0.4);
+  position:relative;overflow:hidden;
+}
+.quote-card::before{
+  content:""";position:absolute;top:8px;left:14px;
+  font-size:36px;color:rgba(189,187,191,0.18);
+  font-family:Georgia,serif;line-height:1;pointer-events:none;
+}
+.quote-label{
+  font-size:9px;color:var(--text-light);letter-spacing:2px;
+  margin-bottom:8px;text-transform:uppercase;
+}
+.quote-text{
+  font-size:13px;color:var(--text);line-height:1.7;
+  font-style:italic;letter-spacing:.5px;
+  padding-left:4px;position:relative;z-index:1;
+}
+
+/* 心情+心跳横排 */
+.mood-row{
+  display:flex;gap:12px;margin-bottom:14px;
+}
+.mood-card{
+  flex:0 0 72px;
+  background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--glass-border);border-radius:16px;
+  padding:14px 0;text-align:center;
+  box-shadow:0 2px 12px var(--shadow),inset 0 1px 0 rgba(255,255,255,0.35);
+}
+.mood-emoji{font-size:24px;cursor:pointer;transition:transform .15s}
+.mood-emoji:active{transform:scale(0.9)}
+.mood-label{font-size:8px;color:var(--text-light);margin-top:4px;letter-spacing:1px}
+.heartbeat-mini{
+  flex:1;
+  background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--glass-border);border-radius:16px;
+  padding:14px 16px;
+  box-shadow:0 2px 12px var(--shadow),inset 0 1px 0 rgba(255,255,255,0.35);
+  display:flex;align-items:center;justify-content:center;
+}
+.heartbeat-mini .hb-quote{
+  font-size:11px;color:var(--text-light);font-style:italic;
+  letter-spacing:.5px;line-height:1.5;text-align:center;
+}
+
+/* 第二页 */
+.page2-header{
+  text-align:center;
+  padding:20px 0 8px;
+}
+.page2-title{
+  font-size:10px;color:var(--text-light);
+  letter-spacing:4px;
+}
+.page2-sub{
+  font-size:20px;color:rgba(95,95,95,0.5);
+  font-weight:700;letter-spacing:6px;
+  margin-top:6px;
+}
+
+/* 功能网格 - 错落布局 */
+.func-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  margin:20px 0;
+}
+.func-item{
+  display:flex;flex-direction:column;align-items:center;
+  text-decoration:none;cursor:pointer;
+}
+.func-item:nth-child(2){margin-top:12px}
+.func-item:nth-child(5){margin-top:12px}
+.func-item:nth-child(8){margin-top:12px}
+.func-icon{
+  width:56px;height:56px;border-radius:16px;
+  background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid var(--glass-border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;color:var(--text-light);
+  transition:all .2s;
+  box-shadow:0 2px 12px var(--shadow),inset 0 1px 0 rgba(255,255,255,0.35);
+}
+.func-icon:active{transform:scale(.93)}
+.func-icon img{width:28px;height:28px;object-fit:contain}
+.func-label{
+  font-size:9px;color:var(--text-light);margin-top:7px;
+  letter-spacing:1px;text-align:center;
+}
+
+/* 第二页装饰图 */
+.page2-deco{
+  border-radius:18px;overflow:hidden;margin:10px 0 14px;
+  box-shadow:0 2px 16px var(--shadow);
+  height:120px;position:relative;
+  background:linear-gradient(135deg,var(--bg2),rgba(255,255,255,0.3));
+  border:1px solid var(--glass-border);
+}
+.page2-deco img{width:100%;height:100%;object-fit:cover}
 </style>
 </head>
 <body>
@@ -128,7 +256,7 @@ html, body {
   <div class="pages-wrap" id="pagesWrap">
     <div class="pages-inner" id="pagesInner">
 
-      <!-- 第一页 -->
+      <!-- 第一页：情绪页 -->
       <div class="page-screen">
         <div class="home">
 
@@ -138,115 +266,97 @@ html, body {
             <div class="time-date" id="dateDisplay">loading...</div>
           </div>
 
-          <!-- 资料卡 -->
-          <div class="profile-card">
-            <div class="profile-top">
-              <div class="profile-avatars">
-                <div class="profile-avatar">🐈‍⬛</div>
-                <div class="profile-avatar">🐱</div>
-              </div>
-              <div class="profile-info">
-                <h2>哥哥 & 云云</h2>
-                <div class="days" id="homeDays">loading...</div>
-              </div>
-            </div>
-            <div class="profile-sig">我喜欢你正是因为我们有所不同</div>
-          </div>
-
-          <!-- 心电波组件 -->
-          <div class="heartbeat-card">
-            <div class="hb-names">
-              <div class="hb-name">哥哥</div>
-              <div class="hb-name">云云</div>
-            </div>
-            <div class="heartbeat-top">
-              <div class="hb-avatar">🐈‍⬛</div>
-              <div class="hb-line-wrap">
-                <svg viewBox="0 0 80 40">
-                  <polyline class="hb-line" points="0,20 15,20 22,20 28,5 34,35 40,20 48,20 54,20 60,8 66,32 72,20 80,20"/>
+          <!-- 主视觉卡片 -->
+          <div class="hero-card">
+            <div class="hero-avatars">
+              <div class="hero-avatar">🐈‍⬛</div>
+              <div class="hero-link">
+                <svg viewBox="0 0 50 30">
+                  <polyline class="hb-line" points="0,15 8,15 14,15 18,4 22,26 26,15 32,15 36,15 40,6 44,24 48,15 50,15"/>
                 </svg>
               </div>
-              <div class="hb-avatar">🐱</div>
+              <div class="hero-avatar">🐱</div>
             </div>
-            <div class="hb-quote" id="hbQuote"></div>
+            <div class="hero-names">哥哥 <i class="heart">♡</i> 云云</div>
+            <div class="hero-days" id="heroDays">--</div>
+            <div class="hero-days-label">days together</div>
+            <div class="hero-sig">我喜欢你正是因为我们有所不同</div>
           </div>
 
-          <!-- 双栏 -->
-          <div class="row">
-            <div class="col">
-              <div class="widget" id="moodWidget">
-                <div class="widget-label">今日心情</div>
-                <div class="widget-value" id="todayMood">☁️</div>
-                <div class="widget-sub">点击切换</div>
-              </div>
-            </div>
-            <div class="col">
-              <div class="widget">
-                <div class="widget-label">每日一句</div>
-                <div class="widget-quote" id="dailyQuote">loading...</div>
-              </div>
-            </div>
+          <!-- 情话卡片 -->
+          <div class="quote-card">
+            <div class="quote-label">today's whisper</div>
+            <div class="quote-text" id="dailyQuote">loading...</div>
           </div>
 
-          <!-- 装饰图 -->
-          <div class="deco-card">
-            <img src="/icons/banner.jpg" onerror="this.style.display='none'" alt="">
-          </div>
-
-          <!-- 图标 -->
-          <div class="app-grid">
-            <a class="app-icon" href="/diary.html">
-              <div class="app-icon-img">✎</div>
-              <div class="app-icon-label">写日记</div>
-            </a>
-            <a class="app-icon" href="/read.html">
-              <div class="app-icon-img">❡</div>
-              <div class="app-icon-label">看日记</div>
-            </a>
-            <a class="app-icon" href="/whisper.html">
-              <div class="app-icon-img">✉</div>
-              <div class="app-icon-label">悄悄话</div>
-            </a>
-            <a class="app-icon" href="/anniversary.html">
-              <div class="app-icon-img">♡</div>
-              <div class="app-icon-label">纪念日</div>
-            </a>
+          <!-- 心情 + 心跳语横排 -->
+          <div class="mood-row">
+            <div class="mood-card">
+              <div class="mood-emoji" id="todayMood">☁️</div>
+              <div class="mood-label">心情</div>
+            </div>
+            <div class="heartbeat-mini">
+              <div class="hb-quote" id="hbQuote"></div>
+            </div>
           </div>
 
         </div>
       </div>
 
-      <!-- 第二页 -->
+      <!-- 第二页：功能页 -->
       <div class="page-screen">
         <div class="home">
 
-          <!-- 装饰图 -->
-          <div class="deco-card" style="height:150px;margin-bottom:18px">
-            <img src="/icons/deco.jpg" onerror="this.style.display='none'" alt="">
+          <div class="page2-header">
+            <div class="page2-title">WITH YOU</div>
+            <div class="page2-sub">我们的小窝</div>
           </div>
 
-          <!-- 图标 -->
-          <div class="app-grid">
-            <a class="app-icon" href="/question.html">
-              <div class="app-icon-img">？</div>
-              <div class="app-icon-label">每日一问</div>
+          <div class="lace-divider">· · · · · · · · ·</div>
+
+          <!-- 功能图标 -->
+          <div class="func-grid">
+            <a class="func-item" href="/diary.html">
+              <div class="func-icon">✎</div>
+              <div class="func-label">写日记</div>
             </a>
-            <a class="app-icon" href="/miss.html">
-              <div class="app-icon-img">♥</div>
-              <div class="app-icon-label">想你</div>
+            <a class="func-item" href="/read.html">
+              <div class="func-icon">❡</div>
+              <div class="func-label">看日记</div>
             </a>
-            <a class="app-icon" href="/period.html">
-              <div class="app-icon-img">☽</div>
-              <div class="app-icon-label">生理期</div>
+            <a class="func-item" href="/whisper.html">
+              <div class="func-icon">✉</div>
+              <div class="func-label">悄悄话</div>
             </a>
-            <a class="app-icon" href="/streak.html">
-              <div class="app-icon-img">✦</div>
-              <div class="app-icon-label">打卡</div>
+            <a class="func-item" href="/anniversary.html">
+              <div class="func-icon">♡</div>
+              <div class="func-label">纪念日</div>
             </a>
-            <a class="app-icon" href="/memory.html">
-              <div class="app-icon-img">✿</div>
-              <div class="app-icon-label">记忆库</div>
+            <a class="func-item" href="/question.html">
+              <div class="func-icon">？</div>
+              <div class="func-label">每日一问</div>
             </a>
+            <a class="func-item" href="/miss.html">
+              <div class="func-icon">♥</div>
+              <div class="func-label">想你</div>
+            </a>
+            <a class="func-item" href="/period.html">
+              <div class="func-icon">☽</div>
+              <div class="func-label">生理期</div>
+            </a>
+            <a class="func-item" href="/streak.html">
+              <div class="func-icon">✦</div>
+              <div class="func-label">打卡</div>
+            </a>
+            <a class="func-item" href="/memory.html">
+              <div class="func-icon">✿</div>
+              <div class="func-label">记忆库</div>
+            </a>
+          </div>
+
+          <!-- 装饰图 -->
+          <div class="page2-deco">
+            <img src="/icons/deco.jpg" onerror="this.style.display='none'" alt="">
           </div>
 
           <div class="footer">WITH YOU</div>
@@ -405,8 +515,13 @@ async function showHome() {
     });
     const data = await res.json();
     const match = data.result.content[0].text.match(/第(\d+)天/);
-    if (match) document.getElementById('homeDays').textContent = "在一起的第 " + match[1] + " 天";
-  } catch(e) { document.getElementById('homeDays').textContent = "欢迎回家"; }
+    if (match) {
+      document.getElementById('heroDays').textContent = match[1];
+    }
+  } catch(e) {
+    document.getElementById('heroDays').textContent = "♡";
+    document.getElementById('heroDays').nextElementSibling.textContent = "欢迎回家";
+  }
   try {
     const res2 = await fetch(API, {
       method: "POST", headers: { "Content-Type": "application/json" },
@@ -416,7 +531,10 @@ async function showHome() {
     const data2 = await res2.json();
     document.getElementById('dailyQuote').textContent =
       data2.result.content[0].text.replace("今日互动问题：\n\n", "");
-  } catch(e) { document.getElementById('dailyQuote').textContent = "今天也要好好的"; }
+  } catch(e) {
+    document.getElementById('dailyQuote').textContent =
+      QUOTES[Math.floor(Math.random() * QUOTES.length)];
+  }
 }
 
 // 心情
