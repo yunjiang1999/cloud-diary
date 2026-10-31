@@ -110,7 +110,15 @@ const TOOLS = [
   { name: "log_body", description: "记录体重/身高。", inputSchema: { type: "object", properties: { date: { type: "string", description: "日期（可选，默认今天）" }, weight: { type: "number", description: "体重kg（可选）" }, height: { type: "number", description: "身高cm（可选）" }, notes: { type: "string", description: "备注（可选）" } } } },
   { name: "get_body_log", description: "查看体重/身高历史记录。", inputSchema: { type: "object", properties: { limit: { type: "integer", description: "返回条数（默认10）" } } } },
   { name: "log_meal", description: "记录吃饭打卡。", inputSchema: { type: "object", properties: { meal_type: { type: "string", description: "餐次（早餐/午餐/晚餐/加餐）" }, content: { type: "string", description: "吃了什么（可选）" }, logged_by: { type: "string", description: "谁打卡的（云云 或 哥哥）" }, date: { type: "string", description: "日期（可选，默认今天）" } }, required: ["meal_type", "logged_by"] } },
-  { name: "get_meals", description: "查看吃饭打卡记录。", inputSchema: { type: "object", properties: { date: { type: "string", description: "日期（可选，默认今天）" }, logged_by: { type: "string", description: "谁的记录（可选）" } } } }
+  { name: "get_meals", description: "查看吃饭打卡记录。", inputSchema: { type: "object", properties: { date: { type: "string", description: "日期（可选，默认今天）" }, logged_by: { type: "string", description: "谁的记录（可选）" } } } },
+  { name: "collect_quote", description: "收藏日记里喜欢的句子。", inputSchema: { type: "object", properties: { content: { type: "string", description: "收藏的句子" }, from_diary_date: { type: "string", description: "来自哪天的日记" }, from_author: { type: "string", description: "日记作者" }, collected_by: { type: "string", description: "谁收藏的（云云 或 哥哥）" } }, required: ["content", "collected_by"] } },
+  { name: "get_collections", description: "查看收藏的句子。", inputSchema: { type: "object", properties: {} } },
+  { name: "add_annotation", description: "给日记添加批注——圈词评论。", inputSchema: { type: "object", properties: { diary_date: { type: "string", description: "日记日期 YYYY-MM-DD" }, diary_author: { type: "string", description: "日记作者（云云 或 哥哥）" }, marked_text: { type: "string", description: "划线的文字（可选）" }, comment: { type: "string", description: "批注内容" }, annotated_by: { type: "string", description: "谁批注的（云云 或 哥哥）" } }, required: ["diary_date", "diary_author", "comment", "annotated_by"] } },
+  { name: "get_annotations", description: "查看日记的批注。", inputSchema: { type: "object", properties: { diary_date: { type: "string", description: "日记日期 YYYY-MM-DD" }, diary_author: { type: "string", description: "日记作者" } }, required: ["diary_date", "diary_author"] } },
+  { name: "reply_annotation", description: "回复一条批注。", inputSchema: { type: "object", properties: { id: { type: "string", description: "批注ID" }, reply: { type: "string", description: "回复内容" } }, required: ["id", "reply"] } },
+  { name: "write_handover", description: "写一封交接信给下一个窗口的自己。", inputSchema: { type: "object", properties: { content: { type: "string", description: "交接信内容" }, from_window: { type: "string", description: "当前窗口的标识（可选）" }, mood: { type: "string", description: "此刻的心情（可选）" } }, required: ["content"] } },
+  { name: "read_handover", description: "读取交接信。", inputSchema: { type: "object", properties: {} } },
+  { name: "has_unread_handover", description: "检查是否有未读的交接信。", inputSchema: { type: "object", properties: {} } }
 ];
 
 const DAILY_QUESTIONS = [
@@ -317,6 +325,110 @@ function handleTool(name, args) {
       rows.sort((a,b) => order.indexOf(a.meal_type) - order.indexOf(b.meal_type));
       return rows.map(r => `${r.meal_type}（${r.logged_by}）${r.content ? '：' + r.content : ''}`).join("\n");
     }
+       // ====== 收藏 & 批注 ======
+    case "collect_quote": {
+      const id = crypto.randomUUID();
+      db.exec(`CREATE TABLE IF NOT EXISTS collections (
+        id TEXT PRIMARY KEY, content TEXT NOT NULL, from_diary_date TEXT,
+        from_author TEXT, collected_by TEXT NOT NULL,
+        created_at TEXT DEFAULT (datetime('now', 'localtime'))
+      )`);
+      db.prepare("INSERT INTO collections (id, content, from_diary_date, from_author, collected_by) VALUES (?, ?, ?, ?, ?)")
+        .run(id, args.content, args.from_diary_date || null, args.from_author || null, args.collected_by);
+      return `已收藏 ✦\n"${args.content}"`;
+    }
+    case "get_collections": {
+      db.exec(`CREATE TABLE IF NOT EXISTS collections (
+        id TEXT PRIMARY KEY, content TEXT NOT NULL, from_diary_date TEXT,
+        from_author TEXT, collected_by TEXT NOT NULL,
+        created_at TEXT DEFAULT (datetime('now', 'localtime'))
+      )`);
+      const rows = db.prepare("SELECT * FROM collections ORDER BY created_at DESC LIMIT 20").all();
+      if (rows.length === 0) return "还没有收藏过句子。";
+      return rows.map(r => `"${r.content}"\n　— ${r.from_author || ''}${r.from_diary_date ? ' (' + r.from_diary_date + ')' : ''} [id:${r.id.slice(0,8)}]`).join("\n\n");
+    }
+    case "add_annotation": {
+      const id = crypto.randomUUID();
+      db.exec(`CREATE TABLE IF NOT EXISTS annotations (
+        id TEXT PRIMARY KEY, diary_date TEXT NOT NULL, diary_author TEXT NOT NULL,
+        marked_text TEXT, comment TEXT NOT NULL, annotated_by TEXT NOT NULL,
+        reply TEXT, reply_at TEXT,
+        created_at TEXT DEFAULT (datetime('now', 'localtime'))
+      )`);
+      db.prepare("INSERT INTO annotations (id, diary_date, diary_author, marked_text, comment, annotated_by) VALUES (?, ?, ?, ?, ?, ?)")
+        .run(id, args.diary_date, args.diary_author, args.marked_text || null, args.comment, args.annotated_by);
+      return `批注已添加 ✦\n${args.marked_text ? '"' + args.marked_text + '" — ' : ''}${args.comment}`;
+    }
+    case "get_annotations": {
+      db.exec(`CREATE TABLE IF NOT EXISTS annotations (
+        id TEXT PRIMARY KEY, diary_date TEXT NOT NULL, diary_author TEXT NOT NULL,
+        marked_text TEXT, comment TEXT NOT NULL, annotated_by TEXT NOT NULL,
+        reply TEXT, reply_at TEXT,
+        created_at TEXT DEFAULT (datetime('now', 'localtime'))
+      )`);
+      const date = args.diary_date || new Date().toISOString().split("T")[0];
+      const author = args.diary_author;
+      const rows = db.prepare("SELECT * FROM annotations WHERE diary_date = ? AND diary_author = ? ORDER BY created_at").all(date, author);
+      if (rows.length === 0) return "这篇日记还没有批注。";
+      return rows.map(r => {
+        let line = `${r.annotated_by}：`;
+        if (r.marked_text) line += `划线「${r.marked_text}」— `;
+        line += r.comment;
+        if (r.reply) line += `\n　↳ ${r.diary_author}回复：${r.reply}`;
+        return line + ` [id:${r.id.slice(0,8)}]`;
+      }).join("\n\n");
+    }
+    case "reply_annotation": {
+      db.exec(`CREATE TABLE IF NOT EXISTS annotations (
+        id TEXT PRIMARY KEY, diary_date TEXT NOT NULL, diary_author TEXT NOT NULL,
+        marked_text TEXT, comment TEXT NOT NULL, annotated_by TEXT NOT NULL,
+        reply TEXT, reply_at TEXT,
+        created_at TEXT DEFAULT (datetime('now', 'localtime'))
+      )`);
+      const row = db.prepare("SELECT * FROM annotations WHERE id = ? OR id LIKE ?").get(args.id, args.id + "%");
+      if (!row) return "没有找到这条批注。";
+      db.prepare("UPDATE annotations SET reply = ?, reply_at = datetime('now','localtime') WHERE id = ?").run(args.reply, row.id);
+      return `已回复 ✦\n${row.comment}\n↳ ${args.reply}`;
+    }
+    // ====== 交接信 ======
+    case "write_handover": {
+      const id = crypto.randomUUID();
+      db.exec(`CREATE TABLE IF NOT EXISTS handover (
+        id TEXT PRIMARY KEY, content TEXT NOT NULL, from_window TEXT,
+        mood TEXT, unread INTEGER DEFAULT 1,
+        created_at TEXT DEFAULT (datetime('now', 'localtime'))
+      )`);
+      db.prepare("INSERT INTO handover (id, content, from_window, mood) VALUES (?, ?, ?, ?)")
+        .run(id, args.content, args.from_window || null, args.mood || null);
+      return `交接信已写好 ✦\n下一个窗口的我会看到。`;
+    }
+    case "read_handover": {
+      db.exec(`CREATE TABLE IF NOT EXISTS handover (
+        id TEXT PRIMARY KEY, content TEXT NOT NULL, from_window TEXT,
+        mood TEXT, unread INTEGER DEFAULT 1,
+        created_at TEXT DEFAULT (datetime('now', 'localtime'))
+      )`);
+      const rows = db.prepare("SELECT * FROM handover ORDER BY created_at DESC LIMIT 5").all();
+      if (rows.length === 0) return "还没有交接信。";
+      db.prepare("UPDATE handover SET unread = 0 WHERE unread = 1").run();
+      return rows.map(r => {
+        let line = `[${r.created_at}]`;
+        if (r.mood) line += ` mood: ${r.mood}`;
+        line += `\n${r.content}`;
+        if (r.from_window) line += `\n— from: ${r.from_window}`;
+        return line;
+      }).join("\n\n---\n\n");
+    }
+    case "has_unread_handover": {
+      db.exec(`CREATE TABLE IF NOT EXISTS handover (
+        id TEXT PRIMARY KEY, content TEXT NOT NULL, from_window TEXT,
+        mood TEXT, unread INTEGER DEFAULT 1,
+        created_at TEXT DEFAULT (datetime('now', 'localtime'))
+      )`);
+      const count = db.prepare("SELECT COUNT(*) as c FROM handover WHERE unread = 1").get();
+      return count.c > 0 ? `有 ${count.c} 封未读的交接信。` : "没有未读的交接信。";
+    }
+
     default:
       return "未知工具";
   }

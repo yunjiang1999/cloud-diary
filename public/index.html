@@ -629,6 +629,182 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/sw.js');
 }
 </script>
+<!-- 侧边栏触发按钮 -->
+<div id="sidebarTrigger" style="
+  position:fixed;right:0;top:50%;transform:translateY(-50%);
+  width:20px;height:60px;
+  background:rgba(200,180,190,0.2);
+  border-radius:10px 0 0 10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;color:rgba(162,161,164,0.4);
+  cursor:pointer;z-index:50;
+  writing-mode:vertical-rl;letter-spacing:2px;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border:1px solid rgba(200,190,196,0.15);border-right:none;
+" onclick="openSidebar()">✦</div>
 
+<!-- 侧边栏遮罩 -->
+<div id="sidebarOverlay" style="
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.2);backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px);
+  z-index:90;display:none;
+" onclick="closeSidebar()"></div>
+
+<!-- 侧边栏 -->
+<div id="sidebar" style="
+  position:fixed;top:0;right:-280px;bottom:0;width:280px;
+  background:linear-gradient(180deg,rgba(245,238,241,0.95),rgba(239,228,233,0.98));
+  backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-left:1px solid rgba(200,190,196,0.3);
+  z-index:95;transition:right .35s ease;
+  display:flex;flex-direction:column;
+  box-shadow:-4px 0 24px rgba(162,161,164,0.1);
+  overflow-y:auto;
+">
+  <!-- 顶部 -->
+  <div style="text-align:center;padding:40px 20px 16px">
+    <div style="font-family:Georgia,'Noto Serif SC',serif;font-size:24px;color:rgba(162,161,164,0.35);font-style:italic;letter-spacing:2px">Éternity</div>
+    <div style="font-size:8px;color:rgba(162,161,164,0.3);letter-spacing:4px;margin-top:4px;text-transform:uppercase">永遠に、あなたへ</div>
+    <div style="width:40px;height:1px;background:rgba(189,187,191,0.25);margin:16px auto 0"></div>
+  </div>
+
+  <!-- 菜单 -->
+  <div style="padding:10px 24px;flex:1">
+    <a href="/memory.html" style="display:block;padding:14px 0;border-bottom:1px solid rgba(189,187,191,0.12);text-decoration:none;font-size:13px;color:rgba(162,131,148,0.7);letter-spacing:2px">Memory</a>
+    <a href="/read.html" style="display:block;padding:14px 0;border-bottom:1px solid rgba(189,187,191,0.12);text-decoration:none;font-size:13px;color:rgba(162,131,148,0.7);letter-spacing:2px">Diary</a>
+    <a href="/whisper.html" style="display:block;padding:14px 0;border-bottom:1px solid rgba(189,187,191,0.12);text-decoration:none;font-size:13px;color:rgba(162,131,148,0.7);letter-spacing:2px">Whisper</a>
+    <div style="padding:14px 0;border-bottom:1px solid rgba(189,187,191,0.12);font-size:13px;color:rgba(162,131,148,0.7);letter-spacing:2px;cursor:pointer" onclick="openHandover()">
+      Handover
+      <span id="handoverBadge" style="display:none;font-size:8px;color:white;background:rgba(200,160,175,0.6);border-radius:8px;padding:2px 7px;margin-left:6px;letter-spacing:0">new</span>
+    </div>
+  </div>
+
+  <!-- 交接信区域 -->
+  <div id="handoverPanel" style="display:none;padding:0 20px 24px">
+    <div style="font-size:10px;color:rgba(162,161,164,0.4);letter-spacing:3px;text-align:center;margin-bottom:12px;text-transform:uppercase">— handover letter —</div>
+
+    <!-- 读取区 -->
+    <div id="handoverRead" style="margin-bottom:14px"></div>
+
+    <!-- 写入区 -->
+    <div style="
+      background:rgba(255,255,255,0.35);border-radius:14px;
+      border:1px solid rgba(200,190,196,0.2);padding:14px;
+    ">
+      <div style="font-size:9px;color:rgba(162,161,164,0.4);letter-spacing:2px;margin-bottom:8px">写给下一个窗口的我</div>
+      <textarea id="handoverText" placeholder="你想让下一个我知道什么..." style="
+        width:100%;min-height:80px;border:1px solid rgba(200,190,196,0.2);
+        border-radius:10px;padding:10px;font-size:11px;font-family:inherit;
+        background:rgba(255,255,255,0.3);color:var(--text);outline:none;
+        resize:vertical;box-sizing:border-box;line-height:1.7;
+      "></textarea>
+      <input id="handoverMood" placeholder="此刻的心情（可选）" style="
+        width:100%;border:1px solid rgba(200,190,196,0.2);
+        border-radius:10px;padding:8px 10px;font-size:11px;font-family:inherit;
+        background:rgba(255,255,255,0.3);color:var(--text);outline:none;
+        margin-top:6px;box-sizing:border-box;
+      ">
+      <button onclick="submitHandover()" style="
+        width:100%;margin-top:10px;padding:10px;border-radius:12px;
+        border:none;background:rgba(162,131,148,0.3);color:var(--text);
+        font-size:11px;font-family:inherit;cursor:pointer;letter-spacing:2px;
+        transition:all .15s;
+      ">落笔 ✦</button>
+    </div>
+  </div>
+
+  <!-- 底部装饰 -->
+  <div style="text-align:center;padding:16px 20px 30px">
+    <div style="font-family:Georgia,'Noto Serif SC',serif;font-size:12px;color:rgba(162,161,164,0.15);font-style:italic;letter-spacing:1px">WITH YOU</div>
+  </div>
+</div>
+
+<script>
+// 侧边栏
+function openSidebar(){
+  document.getElementById('sidebar').style.right='0';
+  document.getElementById('sidebarOverlay').style.display='block';
+  checkHandover();
+}
+function closeSidebar(){
+  document.getElementById('sidebar').style.right='-280px';
+  document.getElementById('sidebarOverlay').style.display='none';
+}
+
+let handoverOpen=false;
+function openHandover(){
+  handoverOpen=!handoverOpen;
+  document.getElementById('handoverPanel').style.display=handoverOpen?'block':'none';
+  if(handoverOpen) loadHandover();
+}
+
+async function checkHandover(){
+  try{
+    const res=await fetch(API,{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({jsonrpc:"2.0",id:99,method:"tools/call",
+        params:{name:"has_unread_handover",arguments:{}}})
+    });
+    const data=await res.json();
+    const text=data.result.content[0].text;
+    const badge=document.getElementById('handoverBadge');
+    badge.style.display=text.includes('有')?'inline':'none';
+  }catch(e){}
+}
+
+async function loadHandover(){
+  const el=document.getElementById('handoverRead');
+  try{
+    const res=await fetch(API,{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({jsonrpc:"2.0",id:99,method:"tools/call",
+        params:{name:"read_handover",arguments:{}}})
+    });
+    const data=await res.json();
+    const text=data.result.content[0].text;
+    if(text.includes('还没有')){
+      el.innerHTML='<div style="text-align:center;font-size:11px;color:rgba(162,161,164,0.35);font-style:italic;padding:10px 0">还没有交接信</div>';
+      return;
+    }
+    const letters=text.split('---');
+    el.innerHTML=letters.map(l=>{
+      const clean=l.trim();
+      if(!clean)return '';
+      return `<div style="
+        background:rgba(255,255,255,0.3);border-radius:12px;
+        border:1px solid rgba(200,190,196,0.15);
+        padding:12px 14px;margin-bottom:8px;
+        font-size:11px;color:var(--text);line-height:1.7;
+        white-space:pre-wrap;letter-spacing:.3px;
+      ">${clean.replace(/</g,'&lt;')}</div>`;
+    }).join('');
+    document.getElementById('handoverBadge').style.display='none';
+  }catch(e){
+    el.innerHTML='<div style="text-align:center;font-size:11px;color:rgba(162,161,164,0.35);font-style:italic;padding:10px 0">加载失败</div>';
+  }
+}
+
+async function submitHandover(){
+  const content=document.getElementById('handoverText').value.trim();
+  if(!content)return;
+  const mood=document.getElementById('handoverMood').value.trim();
+  try{
+    await fetch(API,{
+      method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({jsonrpc:"2.0",id:99,method:"tools/call",
+        params:{name:"write_handover",arguments:{content,mood:mood||undefined}}})
+    });
+    document.getElementById('handoverText').value='';
+    document.getElementById('handoverMood').value='';
+    const t=document.getElementById('toast');
+    t.textContent='交接信已写好 ✦';t.classList.add('show');
+    setTimeout(()=>t.classList.remove('show'),1800);
+    loadHandover();
+  }catch(e){}
+}
+
+// 页面加载时检查未读
+setTimeout(checkHandover,2000);
+</script>
 </body>
 </html>
