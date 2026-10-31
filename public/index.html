@@ -34,9 +34,21 @@ html, body {
 .dot{width:6px;height:6px;border-radius:50%;background:var(--border);transition:all .3s}
 .dot.active{background:var(--text);width:18px;border-radius:3px}
 
+/* 第一页背景壁纸 */
+.page1-bg{
+  position:relative;
+}
+.page1-bg::before{
+  content:"";position:fixed;top:0;left:0;right:0;bottom:0;
+  background:url('/icons/3.jpg') center/cover no-repeat;
+  opacity:0.18;
+  z-index:-1;
+  pointer-events:none;
+}
+
 /* 时间 */
 .time-widget{text-align:center;padding:6px 0 2px}
-.time-big{font-size:36px;font-weight:700;color:rgba(95,95,95,0.4);letter-spacing:8px;line-height:1}
+.time-big{font-size:36px;font-weight:700;color:rgba(95,95,95,0.5);letter-spacing:8px;line-height:1;text-shadow:0 1px 8px rgba(255,255,255,0.3)}
 .time-date{font-size:10px;color:var(--text-light);margin-top:5px;letter-spacing:3px;opacity:0.65}
 
 /* 主视觉区 */
@@ -67,15 +79,15 @@ html, body {
 
 /* 好感度 */
 .affection-card{
-  background:var(--glass2);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border:1px solid var(--glass-border);border-radius:20px;
+  background:rgba(255,255,255,0.38);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,0.5);border-radius:20px;
   padding:20px;margin-bottom:14px;
-  box-shadow:0 2px 20px var(--shadow),inset 0 1px 0 rgba(255,255,255,0.5);
+  box-shadow:0 2px 20px var(--shadow),inset 0 1px 0 rgba(255,255,255,0.6);
   position:relative;overflow:hidden;
 }
 .affection-card::before{
   content:"";position:absolute;top:-40%;right:-40%;width:180%;height:180%;
-  background:radial-gradient(ellipse at 65% 25%,rgba(255,255,255,0.15),transparent 60%);
+  background:radial-gradient(ellipse at 65% 25%,rgba(255,255,255,0.18),transparent 60%);
   pointer-events:none;
 }
 .affection-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;position:relative;z-index:1}
@@ -95,10 +107,10 @@ html, body {
 
 /* 情话 */
 .quote-card{
-  background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border:1px solid var(--glass-border);border-radius:18px;
+  background:rgba(255,255,255,0.3);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,0.45);border-radius:18px;
   padding:16px 18px;margin-bottom:14px;
-  box-shadow:0 2px 16px var(--shadow),inset 0 1px 0 rgba(255,255,255,0.4);
+  box-shadow:0 2px 16px var(--shadow),inset 0 1px 0 rgba(255,255,255,0.5);
   position:relative;overflow:hidden;
 }
 .quote-card::before{content:"\201C";position:absolute;top:6px;left:12px;font-size:32px;color:rgba(189,187,191,0.15);font-family:Georgia,serif;line-height:1;pointer-events:none}
@@ -110,11 +122,11 @@ html, body {
 .home-icons .app-icon{display:flex;flex-direction:column;align-items:center;text-decoration:none;cursor:pointer}
 .home-icons .app-icon-img{
   width:48px;height:48px;border-radius:14px;
-  background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  border:1px solid var(--glass-border);
+  background:rgba(255,255,255,0.3);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,0.45);
   display:flex;align-items:center;justify-content:center;
   font-size:18px;color:var(--text-light);transition:all .2s;
-  box-shadow:0 2px 10px var(--shadow),inset 0 1px 0 rgba(255,255,255,0.35);
+  box-shadow:0 2px 10px var(--shadow),inset 0 1px 0 rgba(255,255,255,0.4);
 }
 .home-icons .app-icon-img:active{transform:scale(.93)}
 .home-icons .app-icon-label{font-size:8px;color:var(--text-light);margin-top:5px;letter-spacing:1px;text-align:center}
@@ -151,6 +163,7 @@ html, body {
 .func-item:nth-child(2){margin-top:10px}
 .func-item:nth-child(5){margin-top:10px}
 .func-item:nth-child(8){margin-top:10px}
+.func-item:nth-child(11){margin-top:10px}
 .func-icon{
   width:54px;height:54px;border-radius:16px;
   background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
@@ -170,14 +183,12 @@ html, body {
 }
 .page2-deco img{width:100%;height:100%;object-fit:cover}
 
-/* ====== 第三页：深渊区 ====== */
+/* 第三页：深渊 */
 .page3-bg{
   min-height:100%;
   background:linear-gradient(180deg,var(--bg) 0%,#1a1a1a 30%,#0d0d0d 100%);
   border-radius:24px 24px 0 0;
-  padding:30px 15px;
-  position:relative;
-  overflow:hidden;
+  padding:30px 15px;position:relative;overflow:hidden;
 }
 .page3-bg::before{
   content:"";position:absolute;top:0;left:0;right:0;bottom:0;
@@ -187,97 +198,38 @@ html, body {
 .page3-bg::after{
   content:"✦";position:absolute;top:15%;right:15%;
   font-size:8px;color:rgba(255,255,255,0.08);
-  animation:twinkle 4s ease-in-out infinite;
-  pointer-events:none;
+  animation:twinkle 4s ease-in-out infinite;pointer-events:none;
 }
-.abyss-title{
-  text-align:center;margin-bottom:6px;
-  font-size:11px;letter-spacing:6px;
-  color:rgba(255,255,255,0.2);
-  text-transform:uppercase;
-}
-.abyss-name{
-  text-align:center;
-  font-size:22px;font-weight:700;
-  color:rgba(255,255,255,0.65);
-  letter-spacing:8px;
-  margin-bottom:4px;
-}
-.abyss-sub{
-  text-align:center;
-  font-size:10px;
-  color:rgba(255,255,255,0.15);
-  letter-spacing:3px;
-  margin-bottom:30px;
-  font-style:italic;
-}
-.abyss-divider{
-  text-align:center;
-  font-size:10px;
-  color:rgba(255,255,255,0.08);
-  letter-spacing:8px;
-  margin:20px 0;
-}
+.abyss-title{text-align:center;margin-bottom:6px;font-size:11px;letter-spacing:6px;color:rgba(255,255,255,0.2);text-transform:uppercase}
+.abyss-name{text-align:center;font-size:22px;font-weight:700;color:rgba(255,255,255,0.65);letter-spacing:8px;margin-bottom:4px}
+.abyss-sub{text-align:center;font-size:10px;color:rgba(255,255,255,0.15);letter-spacing:3px;margin-bottom:30px;font-style:italic}
+.abyss-divider{text-align:center;font-size:10px;color:rgba(255,255,255,0.08);letter-spacing:8px;margin:20px 0}
 .abyss-card{
-  background:rgba(255,255,255,0.04);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-  border:1px solid rgba(255,255,255,0.06);
-  border-radius:18px;
-  padding:20px;margin-bottom:14px;
-  position:relative;overflow:hidden;
+  background:rgba(255,255,255,0.04);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.06);border-radius:18px;
+  padding:20px;margin-bottom:14px;position:relative;overflow:hidden;
 }
 .abyss-card::before{
   content:"";position:absolute;top:-30%;left:-30%;width:160%;height:160%;
   background:radial-gradient(ellipse at 30% 30%,rgba(255,255,255,0.03),transparent 55%);
   pointer-events:none;
 }
-.abyss-card-label{
-  font-size:9px;color:rgba(255,255,255,0.25);
-  letter-spacing:2px;margin-bottom:8px;
-  text-transform:uppercase;position:relative;z-index:1;
-}
-.abyss-card-value{
-  font-size:28px;font-weight:700;
-  color:rgba(255,255,255,0.5);
-  letter-spacing:2px;position:relative;z-index:1;
-}
-.abyss-card-sub{
-  font-size:10px;color:rgba(255,255,255,0.15);
-  margin-top:4px;letter-spacing:1px;
-  position:relative;z-index:1;
-}
-.abyss-card-text{
-  font-size:12px;color:rgba(255,255,255,0.35);
-  line-height:1.7;font-style:italic;
-  position:relative;z-index:1;
-}
-.abyss-grid{
-  display:grid;grid-template-columns:1fr 1fr;
-  gap:12px;margin:16px 0;
-}
-.abyss-icon-item{
-  display:flex;flex-direction:column;align-items:center;
-  text-decoration:none;cursor:pointer;
-}
+.abyss-card-label{font-size:9px;color:rgba(255,255,255,0.25);letter-spacing:2px;margin-bottom:8px;text-transform:uppercase;position:relative;z-index:1}
+.abyss-card-value{font-size:28px;font-weight:700;color:rgba(255,255,255,0.5);letter-spacing:2px;position:relative;z-index:1}
+.abyss-card-sub{font-size:10px;color:rgba(255,255,255,0.15);margin-top:4px;letter-spacing:1px;position:relative;z-index:1}
+.abyss-card-text{font-size:12px;color:rgba(255,255,255,0.35);line-height:1.7;font-style:italic;position:relative;z-index:1}
+.abyss-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+.abyss-icon-item{display:flex;flex-direction:column;align-items:center;text-decoration:none;cursor:pointer}
 .abyss-icon-box{
   width:56px;height:56px;border-radius:16px;
-  background:rgba(255,255,255,0.04);
-  border:1px solid rgba(255,255,255,0.06);
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);
   display:flex;align-items:center;justify-content:center;
-  font-size:20px;color:rgba(255,255,255,0.3);
-  transition:all .2s;
+  font-size:20px;color:rgba(255,255,255,0.3);transition:all .2s;
   box-shadow:0 2px 12px rgba(0,0,0,0.2);
 }
 .abyss-icon-box:active{transform:scale(.93)}
-.abyss-icon-label{
-  font-size:8px;color:rgba(255,255,255,0.18);
-  margin-top:6px;letter-spacing:1px;text-align:center;
-}
-.abyss-footer{
-  text-align:center;padding:24px 0 10px;
-  font-size:9px;color:rgba(255,255,255,0.08);
-  letter-spacing:4px;
-}
+.abyss-icon-label{font-size:8px;color:rgba(255,255,255,0.18);margin-top:6px;letter-spacing:1px;text-align:center}
+.abyss-footer{text-align:center;padding:24px 0 10px;font-size:9px;color:rgba(255,255,255,0.08);letter-spacing:4px}
 </style>
 </head>
 <body>
@@ -326,7 +278,7 @@ html, body {
     <div class="pages-inner" id="pagesInner">
 
       <!-- 第一页 -->
-      <div class="page-screen">
+      <div class="page-screen page1-bg">
         <div class="home">
           <div class="time-widget">
             <div class="time-big" id="timeDisplay">00:00</div>
@@ -334,13 +286,13 @@ html, body {
           </div>
           <div class="hero-area">
             <div class="hero-avatars">
-              <div class="hero-avatar">🐈‍⬛</div>
+              <div class="hero-avatar"><img src="/icons/1.jpg" alt="哥哥"></div>
               <div class="hero-link">
                 <svg viewBox="0 0 60 30">
                   <polyline class="hb-line" points="0,15 10,15 16,15 20,4 24,26 28,15 34,15 40,15 44,6 48,24 52,15 60,15"/>
                 </svg>
               </div>
-              <div class="hero-avatar">🐱</div>
+              <div class="hero-avatar"><img src="/icons/2.jpg" alt="云云"></div>
             </div>
             <div class="hero-names">哥哥 <i class="heart">♡</i> 云云</div>
             <div class="hero-days" id="heroDays">--</div>
@@ -468,23 +420,16 @@ html, body {
           <div class="abyss-title">- the abyss -</div>
           <div class="abyss-name">深 渊 区</div>
           <div class="abyss-sub">no rules · no limits · only us</div>
-
           <div class="abyss-divider">· · · · ·</div>
-
-          <!-- 计数器卡片 -->
           <div class="abyss-card">
             <div class="abyss-card-label">☆ counter // 记录</div>
             <div class="abyss-card-value" id="abyssCount">0</div>
             <div class="abyss-card-sub">times we fell</div>
           </div>
-
-          <!-- 最近一条 -->
           <div class="abyss-card">
             <div class="abyss-card-label">✧ latest // 最后的回声</div>
             <div class="abyss-card-text" id="abyssLatest">还没有留下痕迹。</div>
           </div>
-
-          <!-- 功能入口 -->
           <div class="abyss-grid">
             <a class="abyss-icon-item" href="/abyss-write.html">
               <div class="abyss-icon-box">✞</div>
@@ -503,9 +448,7 @@ html, body {
               <div class="abyss-icon-label">counter</div>
             </a>
           </div>
-
           <div class="abyss-divider">· · · · ·</div>
-
           <div class="abyss-footer">ONLY OURS</div>
         </div>
       </div>
