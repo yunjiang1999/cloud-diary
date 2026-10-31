@@ -40,15 +40,8 @@ html, body {
 .time-date{font-size:10px;color:var(--text-light);margin-top:5px;letter-spacing:3px;opacity:0.65}
 
 /* 主视觉区 */
-.hero-area{
-  text-align:center;
-  padding:16px 0 12px;
-  position:relative;
-}
-.hero-avatars{
-  display:flex;align-items:center;justify-content:center;gap:0;
-  margin-bottom:14px;
-}
+.hero-area{text-align:center;padding:16px 0 12px;position:relative}
+.hero-avatars{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:14px}
 .hero-avatar{
   width:72px;height:72px;border-radius:50%;
   border:2.5px solid rgba(255,255,255,0.7);background:var(--bg2);
@@ -57,44 +50,20 @@ html, body {
   box-shadow:0 3px 14px rgba(162,161,164,0.15);
 }
 .hero-avatar img{width:100%;height:100%;object-fit:cover}
-.hero-link{
-  width:60px;height:30px;overflow:hidden;position:relative;
-  margin:0 -6px;
-}
+.hero-link{width:60px;height:30px;overflow:hidden;position:relative;margin:0 -6px}
 .hero-link svg{width:100%;height:100%}
 .hero-link .hb-line{
   fill:none;stroke:rgba(189,187,191,0.45);stroke-width:1.2;
   stroke-dasharray:200;stroke-dashoffset:200;
   animation:heartLine 2.5s ease-in-out infinite;
 }
-@keyframes heartLine{
-  0%{stroke-dashoffset:200}50%{stroke-dashoffset:0}100%{stroke-dashoffset:-200}
-}
-.hero-names{
-  font-size:14px;color:var(--text);font-weight:600;
-  letter-spacing:3px;margin-bottom:4px;
-}
-.hero-names .heart{
-  display:inline-block;font-style:normal;font-weight:400;
-  color:var(--text-light);font-size:12px;margin:0 6px;
-}
-.hero-days{
-  font-size:36px;font-weight:700;color:var(--text);
-  letter-spacing:2px;line-height:1.2;margin:8px 0 2px;
-}
-.hero-days-label{
-  font-size:9px;color:var(--text-light);letter-spacing:3px;
-  text-transform:uppercase;
-}
-.hero-sig{
-  font-size:11px;color:var(--text-light);font-style:italic;
-  letter-spacing:1px;line-height:1.6;
-  margin-top:12px;
-}
-.hero-sig::before{
-  content:"";display:block;width:30px;height:1px;
-  background:rgba(189,187,191,0.3);margin:0 auto 10px;
-}
+@keyframes heartLine{0%{stroke-dashoffset:200}50%{stroke-dashoffset:0}100%{stroke-dashoffset:-200}}
+.hero-names{font-size:14px;color:var(--text);font-weight:600;letter-spacing:3px;margin-bottom:4px}
+.hero-names .heart{display:inline-block;font-style:normal;font-weight:400;color:var(--text-light);font-size:12px;margin:0 6px}
+.hero-days{font-size:36px;font-weight:700;color:var(--text);letter-spacing:2px;line-height:1.2;margin:8px 0 2px}
+.hero-days-label{font-size:9px;color:var(--text-light);letter-spacing:3px;text-transform:uppercase}
+.hero-sig{font-size:11px;color:var(--text-light);font-style:italic;letter-spacing:1px;line-height:1.6;margin-top:12px}
+.hero-sig::before{content:"";display:block;width:30px;height:1px;background:rgba(189,187,191,0.3);margin:0 auto 10px}
 
 /* 好感度 */
 .affection-card{
@@ -105,50 +74,22 @@ html, body {
   position:relative;overflow:hidden;
 }
 .affection-card::before{
-  content:"";position:absolute;top:-40%;right:-40%;
-  width:180%;height:180%;
+  content:"";position:absolute;top:-40%;right:-40%;width:180%;height:180%;
   background:radial-gradient(ellipse at 65% 25%,rgba(255,255,255,0.15),transparent 60%);
   pointer-events:none;
 }
-.affection-header{
-  display:flex;justify-content:space-between;align-items:baseline;
-  margin-bottom:12px;position:relative;z-index:1;
-}
-.affection-title{
-  font-size:11px;color:var(--text);font-weight:600;letter-spacing:1px;
-}
-.affection-title span{
-  font-weight:400;color:var(--text-light);font-size:10px;margin-left:6px;
-  letter-spacing:0;
-}
-.affection-pct{
-  font-size:12px;color:var(--text);font-weight:700;letter-spacing:1px;
-}
-.affection-bar{
-  width:100%;height:4px;border-radius:2px;
-  background:rgba(189,187,191,0.2);
-  margin-bottom:14px;position:relative;z-index:1;
-  overflow:hidden;
-}
-.affection-bar-inner{
-  height:100%;border-radius:2px;
-  background:linear-gradient(90deg,rgba(200,180,190,0.6),rgba(180,160,175,0.8));
-  transition:width 1s ease;
-}
-.affection-divider{
-  border:none;border-top:1px dashed rgba(189,187,191,0.25);
-  margin:0 0 12px;
-}
+.affection-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;position:relative;z-index:1}
+.affection-title{font-size:11px;color:var(--text);font-weight:600;letter-spacing:1px}
+.affection-title span{font-weight:400;color:var(--text-light);font-size:10px;margin-left:6px;letter-spacing:0}
+.affection-pct{font-size:12px;color:var(--text);font-weight:700;letter-spacing:1px}
+.affection-bar{width:100%;height:4px;border-radius:2px;background:rgba(189,187,191,0.2);margin-bottom:14px;position:relative;z-index:1;overflow:hidden}
+.affection-bar-inner{height:100%;border-radius:2px;background:linear-gradient(90deg,rgba(200,180,190,0.6),rgba(180,160,175,0.8));transition:width 1s ease}
+.affection-divider{border:none;border-top:1px dashed rgba(189,187,191,0.25);margin:0 0 12px}
 .affection-relation{position:relative;z-index:1;margin-bottom:10px}
 .affection-relation-label{font-size:9px;color:var(--text-light);letter-spacing:2px;margin-bottom:4px}
 .affection-relation-value{font-size:13px;color:var(--text);font-weight:600;letter-spacing:1px}
 .affection-relation-sub{font-size:10px;color:var(--text-light);margin-top:2px;letter-spacing:.5px}
-.affection-impression{
-  position:relative;z-index:1;
-  padding:10px 12px;
-  border-left:2px solid rgba(200,180,190,0.5);
-  margin-top:12px;
-}
+.affection-impression{position:relative;z-index:1;padding:10px 12px;border-left:2px solid rgba(200,180,190,0.5);margin-top:12px}
 .affection-impression-label{font-size:9px;color:var(--text-light);letter-spacing:2px;margin-bottom:4px}
 .affection-impression-text{font-size:12px;color:var(--text);font-style:italic;line-height:1.6;letter-spacing:.5px}
 
@@ -160,37 +101,23 @@ html, body {
   box-shadow:0 2px 16px var(--shadow),inset 0 1px 0 rgba(255,255,255,0.4);
   position:relative;overflow:hidden;
 }
-.quote-card::before{
-  content:"\201C";position:absolute;top:6px;left:12px;
-  font-size:32px;color:rgba(189,187,191,0.15);
-  font-family:Georgia,serif;line-height:1;pointer-events:none;
-}
+.quote-card::before{content:"\201C";position:absolute;top:6px;left:12px;font-size:32px;color:rgba(189,187,191,0.15);font-family:Georgia,serif;line-height:1;pointer-events:none}
 .quote-label{font-size:9px;color:var(--text-light);letter-spacing:2px;margin-bottom:6px;text-transform:uppercase}
 .quote-text{font-size:12px;color:var(--text);line-height:1.7;font-style:italic;letter-spacing:.5px;padding-left:4px;position:relative;z-index:1}
 
 /* 首页图标 */
-.home-icons{
-  display:flex;justify-content:center;gap:24px;
-  padding:6px 0 0;
-}
-.home-icons .app-icon{
-  display:flex;flex-direction:column;align-items:center;
-  text-decoration:none;cursor:pointer;
-}
+.home-icons{display:flex;justify-content:center;gap:24px;padding:6px 0 0}
+.home-icons .app-icon{display:flex;flex-direction:column;align-items:center;text-decoration:none;cursor:pointer}
 .home-icons .app-icon-img{
   width:48px;height:48px;border-radius:14px;
   background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   border:1px solid var(--glass-border);
   display:flex;align-items:center;justify-content:center;
-  font-size:18px;color:var(--text-light);
-  transition:all .2s;
+  font-size:18px;color:var(--text-light);transition:all .2s;
   box-shadow:0 2px 10px var(--shadow),inset 0 1px 0 rgba(255,255,255,0.35);
 }
 .home-icons .app-icon-img:active{transform:scale(.93)}
-.home-icons .app-icon-label{
-  font-size:8px;color:var(--text-light);margin-top:5px;
-  letter-spacing:1px;text-align:center;
-}
+.home-icons .app-icon-label{font-size:8px;color:var(--text-light);margin-top:5px;letter-spacing:1px;text-align:center}
 
 /* 第二页 */
 .page2-header{text-align:center;padding:16px 0 6px}
@@ -219,14 +146,8 @@ html, body {
 .question-label{font-size:8px;color:var(--text-light);letter-spacing:2px;margin-bottom:4px;text-transform:uppercase}
 .question-text{font-size:11px;color:var(--text);line-height:1.6;font-style:italic}
 
-.func-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);
-  gap:14px;margin:16px 0;
-}
-.func-item{
-  display:flex;flex-direction:column;align-items:center;
-  text-decoration:none;cursor:pointer;
-}
+.func-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:16px 0}
+.func-item{display:flex;flex-direction:column;align-items:center;text-decoration:none;cursor:pointer}
 .func-item:nth-child(2){margin-top:10px}
 .func-item:nth-child(5){margin-top:10px}
 .func-item:nth-child(8){margin-top:10px}
@@ -235,24 +156,128 @@ html, body {
   background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
   border:1px solid var(--glass-border);
   display:flex;align-items:center;justify-content:center;
-  font-size:19px;color:var(--text-light);
-  transition:all .2s;
+  font-size:19px;color:var(--text-light);transition:all .2s;
   box-shadow:0 2px 12px var(--shadow),inset 0 1px 0 rgba(255,255,255,0.35);
 }
 .func-icon:active{transform:scale(.93)}
-.func-label{
-  font-size:9px;color:var(--text-light);margin-top:6px;
-  letter-spacing:1px;text-align:center;
-}
+.func-label{font-size:9px;color:var(--text-light);margin-top:6px;letter-spacing:1px;text-align:center}
 
 .page2-deco{
   border-radius:18px;overflow:hidden;margin:8px 0 14px;
-  box-shadow:0 2px 16px var(--shadow);
-  height:110px;position:relative;
+  box-shadow:0 2px 16px var(--shadow);height:110px;position:relative;
   background:linear-gradient(135deg,var(--bg2),rgba(255,255,255,0.3));
   border:1px solid var(--glass-border);
 }
 .page2-deco img{width:100%;height:100%;object-fit:cover}
+
+/* ====== 第三页：深渊区 ====== */
+.page3-bg{
+  min-height:100%;
+  background:linear-gradient(180deg,var(--bg) 0%,#1a1a1a 30%,#0d0d0d 100%);
+  border-radius:24px 24px 0 0;
+  padding:30px 15px;
+  position:relative;
+  overflow:hidden;
+}
+.page3-bg::before{
+  content:"";position:absolute;top:0;left:0;right:0;bottom:0;
+  background:radial-gradient(ellipse at 50% 0%,rgba(200,180,190,0.08),transparent 60%);
+  pointer-events:none;
+}
+.page3-bg::after{
+  content:"✦";position:absolute;top:15%;right:15%;
+  font-size:8px;color:rgba(255,255,255,0.08);
+  animation:twinkle 4s ease-in-out infinite;
+  pointer-events:none;
+}
+.abyss-title{
+  text-align:center;margin-bottom:6px;
+  font-size:11px;letter-spacing:6px;
+  color:rgba(255,255,255,0.2);
+  text-transform:uppercase;
+}
+.abyss-name{
+  text-align:center;
+  font-size:22px;font-weight:700;
+  color:rgba(255,255,255,0.65);
+  letter-spacing:8px;
+  margin-bottom:4px;
+}
+.abyss-sub{
+  text-align:center;
+  font-size:10px;
+  color:rgba(255,255,255,0.15);
+  letter-spacing:3px;
+  margin-bottom:30px;
+  font-style:italic;
+}
+.abyss-divider{
+  text-align:center;
+  font-size:10px;
+  color:rgba(255,255,255,0.08);
+  letter-spacing:8px;
+  margin:20px 0;
+}
+.abyss-card{
+  background:rgba(255,255,255,0.04);
+  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:18px;
+  padding:20px;margin-bottom:14px;
+  position:relative;overflow:hidden;
+}
+.abyss-card::before{
+  content:"";position:absolute;top:-30%;left:-30%;width:160%;height:160%;
+  background:radial-gradient(ellipse at 30% 30%,rgba(255,255,255,0.03),transparent 55%);
+  pointer-events:none;
+}
+.abyss-card-label{
+  font-size:9px;color:rgba(255,255,255,0.25);
+  letter-spacing:2px;margin-bottom:8px;
+  text-transform:uppercase;position:relative;z-index:1;
+}
+.abyss-card-value{
+  font-size:28px;font-weight:700;
+  color:rgba(255,255,255,0.5);
+  letter-spacing:2px;position:relative;z-index:1;
+}
+.abyss-card-sub{
+  font-size:10px;color:rgba(255,255,255,0.15);
+  margin-top:4px;letter-spacing:1px;
+  position:relative;z-index:1;
+}
+.abyss-card-text{
+  font-size:12px;color:rgba(255,255,255,0.35);
+  line-height:1.7;font-style:italic;
+  position:relative;z-index:1;
+}
+.abyss-grid{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:12px;margin:16px 0;
+}
+.abyss-icon-item{
+  display:flex;flex-direction:column;align-items:center;
+  text-decoration:none;cursor:pointer;
+}
+.abyss-icon-box{
+  width:56px;height:56px;border-radius:16px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.06);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;color:rgba(255,255,255,0.3);
+  transition:all .2s;
+  box-shadow:0 2px 12px rgba(0,0,0,0.2);
+}
+.abyss-icon-box:active{transform:scale(.93)}
+.abyss-icon-label{
+  font-size:8px;color:rgba(255,255,255,0.18);
+  margin-top:6px;letter-spacing:1px;text-align:center;
+}
+.abyss-footer{
+  text-align:center;padding:24px 0 10px;
+  font-size:9px;color:rgba(255,255,255,0.08);
+  letter-spacing:4px;
+}
 </style>
 </head>
 <body>
@@ -303,12 +328,10 @@ html, body {
       <!-- 第一页 -->
       <div class="page-screen">
         <div class="home">
-
           <div class="time-widget">
             <div class="time-big" id="timeDisplay">00:00</div>
             <div class="time-date" id="dateDisplay">loading...</div>
           </div>
-
           <div class="hero-area">
             <div class="hero-avatars">
               <div class="hero-avatar">🐈‍⬛</div>
@@ -324,7 +347,6 @@ html, body {
             <div class="hero-days-label">days together</div>
             <div class="hero-sig">我喜欢你正是因为我们有所不同</div>
           </div>
-
           <div class="affection-card">
             <div class="affection-header">
               <div class="affection-title">☆ 好感度 · 亲密度 <span>// affection</span></div>
@@ -344,12 +366,10 @@ html, body {
               <div class="affection-impression-text">嘴硬心软，故作坚强，其实一句 good girl 就会红眼眶的小猫</div>
             </div>
           </div>
-
           <div class="quote-card">
             <div class="quote-label">today's whisper</div>
             <div class="quote-text" id="dailyQuote">loading...</div>
           </div>
-
           <div class="home-icons">
             <a class="app-icon" href="/diary.html">
               <div class="app-icon-img">✎</div>
@@ -368,21 +388,17 @@ html, body {
               <div class="app-icon-label">memory</div>
             </a>
           </div>
-
         </div>
       </div>
 
       <!-- 第二页 -->
       <div class="page-screen">
         <div class="home">
-
           <div class="page2-header">
             <div class="page2-title">WITH YOU</div>
             <div class="page2-sub">我们的小窝</div>
           </div>
-
           <div class="lace-divider">· · · · · · · · ·</div>
-
           <div class="mood-question-row">
             <div class="mood-card-s">
               <div class="mood-emoji" id="todayMood">☁️</div>
@@ -393,7 +409,6 @@ html, body {
               <div class="question-text" id="dailyQuestion">loading...</div>
             </div>
           </div>
-
           <div class="func-grid">
             <a class="func-item" href="/diary.html">
               <div class="func-icon">✎</div>
@@ -431,14 +446,67 @@ html, body {
               <div class="func-icon">✿</div>
               <div class="func-label">memory</div>
             </a>
+            <a class="func-item" href="/collect.html">
+              <div class="func-icon">✂</div>
+              <div class="func-label">collect</div>
+            </a>
+            <a class="func-item" href="/coupon.html">
+              <div class="func-icon">♛</div>
+              <div class="func-label">coupon</div>
+            </a>
           </div>
-
           <div class="page2-deco">
             <img src="/icons/deco.jpg" onerror="this.style.display='none'" alt="">
           </div>
-
           <div class="footer">WITH YOU</div>
+        </div>
+      </div>
 
+      <!-- 第三页：深渊 -->
+      <div class="page-screen">
+        <div class="page3-bg">
+          <div class="abyss-title">- the abyss -</div>
+          <div class="abyss-name">深 渊 区</div>
+          <div class="abyss-sub">no rules · no limits · only us</div>
+
+          <div class="abyss-divider">· · · · ·</div>
+
+          <!-- 计数器卡片 -->
+          <div class="abyss-card">
+            <div class="abyss-card-label">☆ counter // 记录</div>
+            <div class="abyss-card-value" id="abyssCount">0</div>
+            <div class="abyss-card-sub">times we fell</div>
+          </div>
+
+          <!-- 最近一条 -->
+          <div class="abyss-card">
+            <div class="abyss-card-label">✧ latest // 最后的回声</div>
+            <div class="abyss-card-text" id="abyssLatest">还没有留下痕迹。</div>
+          </div>
+
+          <!-- 功能入口 -->
+          <div class="abyss-grid">
+            <a class="abyss-icon-item" href="/abyss-write.html">
+              <div class="abyss-icon-box">✞</div>
+              <div class="abyss-icon-label">write</div>
+            </a>
+            <a class="abyss-icon-item" href="/abyss-read.html">
+              <div class="abyss-icon-box">◎</div>
+              <div class="abyss-icon-label">read</div>
+            </a>
+            <a class="abyss-icon-item" href="/abyss-comment.html">
+              <div class="abyss-icon-box">✧</div>
+              <div class="abyss-icon-label">comment</div>
+            </a>
+            <a class="abyss-icon-item" href="/abyss-counter.html">
+              <div class="abyss-icon-box">♯</div>
+              <div class="abyss-icon-label">counter</div>
+            </a>
+          </div>
+
+          <div class="abyss-divider">· · · · ·</div>
+
+          <div class="abyss-footer">ONLY OURS</div>
         </div>
       </div>
 
@@ -446,6 +514,7 @@ html, body {
   </div>
   <div class="dots" id="dots">
     <div class="dot active"></div>
+    <div class="dot"></div>
     <div class="dot"></div>
   </div>
 </div>
@@ -477,15 +546,6 @@ const QUOTES = [
   "我对你的喜欢，是安静的，满的。",
   "你笑起来的样子，是我见过最好的天气。",
   "如果可以，我想把所有温柔都给你。"
-];
-const HB_QUOTES = [
-  "两颗心，同一个频率。",
-  "你的心跳，是我听过最好的音乐。",
-  "距离是假的，心跳是真的。",
-  "不同的地方，同一个节拍。",
-  "每一次跳动，都在说想你。",
-  "隔着屏幕，心跳也能同步。",
-  "你在那边，我在这边，中间是心跳的声音。"
 ];
 
 // 开屏
@@ -553,7 +613,7 @@ updateTime();
 setInterval(updateTime, 10000);
 
 // 滑动
-let currentPage = 0, totalPages = 2, startX = 0, diffX = 0, dragging = false;
+let currentPage = 0, totalPages = 3, startX = 0, diffX = 0, dragging = false;
 const inner = document.getElementById('pagesInner');
 const dotsEl = document.getElementById('dots');
 function goPage(p) {
