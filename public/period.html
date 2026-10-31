@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>WITH YOU · 健康</title>
+<link rel="stylesheet" href="/css/style.css">
+<meta name="theme-color" content="#efe4e9">
+<style>
+body{min-height:100vh;padding-bottom:40px}
+
+.hp-header{
+  display:flex;align-items:center;gap:12px;
+  padding:18px 15px 10px;max-width:420px;margin:0 auto;
+}
+.hp-back{
+  width:34px;height:34px;border-radius:50%;
+  border:1px solid var(--glass-border);
+  background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;color:var(--text);cursor:pointer;text-decoration:none;
+}
+.hp-title{font-size:16px;color:var(--text);font-weight:600;letter-spacing:3px}
+.hp-subtitle{font-size:9px;color:var(--text-light);letter-spacing:2px;margin-left:auto}
+
+.hp-tabs{
+  display:flex;gap:0;max-width:420px;margin:0 auto;padding:0 15px;
+}
+.hp-tab{
+  flex:1;text-align:center;padding:10px 0 8px;
+  font-size:10px;color:var(--text-light);letter-spacing:2px;cursor:pointer;
+  border-bottom:2px solid transparent;transition:all .2s;
+}
+.hp-tab.active{color:var(--text);font-weight:600;border-bottom-color:var(--text)}
+
+.hp-content{max-width:420px;margin:0 auto;padding:14px 15px}
+.hp-panel{display:none}
+.hp-panel.active{display:block}
+
+.hp-card{
+  background:var(--glass2);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--glass-border);border-radius:18px;
+  padding:18px;margin-bottom:14px;
+  box-shadow:0 2px 16px var(--shadow),inset 0 1px 0 rgba(255,255,255,0.5);
+  position:relative;overflow:hidden;
+}
+.hp-card::before{
+  content:"";position:absolute;top:-40%;left:-40%;width:180%;height:180%;
+  background:radial-gradient(ellipse at 30% 25%,rgba(255,255,255,0.15),transparent 60%);
+  pointer-events:none;
+}
+.hp-card-title{
+  font-size:11px;color:var(--text);font-weight:600;letter-spacing:2px;
+  margin-bottom:12px;position:relative;z-index:1;
+  display:flex;align-items:center;gap:6px;
+}
+.hp-card-title::before{
+  content:"";width:3px;height:12px;border-radius:2px;
+  background:linear-gradient(180deg,rgba(200,180,190,0.6),rgba(180,160,175,0.8));
+}
+
+/* 周期状态大卡 */
+.cycle-status{
+  text-align:center;padding:8px 0;position:relative;z-index:1;
+}
+.cycle-day{
+  font-size:52px;font-weight:700;color:var(--text);
+  letter-spacing:2px;line-height:1;
+}
+.cycle-label{
+  font-size:10px;color:var(--text-light);letter-spacing:3px;
+  margin-top:6px;text-transform:uppercase;
+}
+.cycle-predict{
+  margin-top:14px;padding-top:12px;
+  border-top:1px dashed rgba(189,187,191,0.25);
+  font-size:11px;color:var(--text-light);letter-spacing:1px;
+  font-style:italic;
+}
+.cycle-avg{
+  font-size:10px;color:var(--text-light);letter-spacing:1px;
+  margin-top:6px;
+}
+
+/* 经期记录按钮 */
+.period-actions{
+  display:flex;gap:10px;position:relative;z-index:1;
+}
+.period-btn{
+  flex:1;padding:12px;border-radius:14px;
+  border:1px solid var(--glass-border);
+  background:rgba(255,255,255,0.3);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  color:var(--text);font-size:11px;font-family:inherit;
+  cursor:pointer;text-align:center;letter-spacing:2px;
+  transition:all .15s;
+}
+.period-btn:active{transform:scale(.97);background:rgba(162,161,164,.2)}
+.period-btn.end{color:var(--text-light)}
+
+/* 历史记录 */
+.period-history{position:relative;z-index:1}
+.ph-item{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 0;border-bottom:1px solid rgba(189,187,191,0.1);
+}
+.ph-item:last-child{border-bottom:none}
+.ph-dates{font-size:11px;color:var(--text);letter-spacing:.5px}
+.ph-days{
+  font-size:12px;font-weight:600;color:var(--text);
+  background:rgba(200,180,190,0.15);border-radius:8px;
+  padding:3px 10px;
+}
+.ph-ongoing{
+  font-size:10px;color:var(--text-light);font-style:italic;
+  background:rgba(200,180,190,0.1);border-radius:8px;
+  padding:3px 10px;
+}
+
+/* ====== 体态 tab ====== */
+.body-stat{
+  display:flex;gap:12px;margin-bottom:14px;
+}
+.body-stat-card{
+  flex:1;
+  background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--glass-border);border-radius:16px;
+  padding:16px 14px;text-align:center;
+  box-shadow:0 2px 12px var(--shadow),inset 0 1px 0 rgba(255,255,255,0.35);
+}
+.body-stat-value{
+  font-size:28px;font-weight:700;color:var(--text);letter-spacing:1px;
+}
+.body-stat-unit{
+  font-size:10px;color:var(--text-light);font-weight:400;
+}
+.body-stat-label{
+  font-size:9px;color:var(--text-light);letter-spacing:2px;margin-top:4px;
+  text-transform:uppercase;
+}
+.body-stat-change{
+  font-size:9px;color:var(--text-light);margin-top:4px;letter-spacing:1px;
+}
+
+/* 体重图表 */
+.body-chart{
+  position:relative;z-index:1;height:120px;
+  margin:10px 0;
+}
+.body-chart svg{width:100%;height:100%}
+.chart-line{
+  fill:none;stroke:rgba(200,180,190,0.6);stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round;
+}
+.chart-area{
+  fill:url(#chartGrad);opacity:0.3;
+}
+.chart-dot{
+  fill:rgba(200,180,190,0.8);stroke:white;stroke-width:2;
+}
+.chart-label{
+  font-size:8px;fill:var(--text-light);text-anchor:middle;
+}
+
+/* 历史列表 */
+.body-list{position:relative;z-index:1}
+.bl-item{
+  display:flex;align-items:center;gap:12px;
+  padding:8px 0;border-bottom:1px solid rgba(189,187,191,0.1);
+}
+.bl-item:last-child{border-bottom:none}
+.bl-date{font-size:10px;color:var(--text-light);letter-spacing:1px;width:70px;flex-shrink:0}
+.bl-values{font-size:12px;color:var(--text);flex:1}
+.bl-note{font-size:10px;color:var(--text-light);font-style:italic}
+
+/* ====== 吃饭打卡 tab ====== */
+.meal-grid{
+  display:grid;grid-template-columns:1fr 1fr;gap:10px;
+  position:relative;z-index:1;
+}
+.meal-slot{
+  background:rgba(255,255,255,0.25);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  border:1px solid var(--glass-border);border-radius:14px;
+  padding:14px;cursor:pointer;transition:all .2s;
+  text-align:center;
+}
+.meal-slot:active{transform:scale(.97)}
+.meal-slot.checked{
+  background:rgba(200,180,190,0.2);
+  border-color:rgba(200,180,190,0.4);
+}
+.meal-icon{font-size:24px;margin-bottom:6px}
+.meal-name{font-size:11px;color:var(--text);letter-spacing:2px;font-weight:600}
+.meal-content{
+  font-size:9px;color:var(--text-light);margin-top:4px;
+  font-style:italic;min-height:14px;
+}
+.meal-check{
+  font-size:9px;color:rgba(200,180,190,0.7);margin-top:4px;letter-spacing:1px;
+}
+
+.hp-add-btn{
+  display:block;width:100%;padding:12px;
+  border-radius:14px;border:1px dashed rgba(189,187,191,0.3);
+  background:rgba(255,255,255,0.2);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  color:var(--text-light);font-size:11px;font-family:inherit;
+  cursor:pointer;text-align:center;letter-spacing:2px;
+  margin-top:10px;transition:all .15s;
+}
+.hp-add-btn:active{transform:scale(.98);background:rgba(255,255,255,0.35)}
+
+.hp-empty{
+  text-align:center;padding:24px 0;
+  font-size:12px;color:var(--text-light);
+  font-style:italic;letter-spacing:1px;
+}
+
+/* 弹窗 */
+.hp-modal-overlay{
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.3);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  z-index:100;display:none;align-items:center;justify-content:center;
+}
+.hp-modal-overlay.show{display:flex}
+.hp-modal{
+  width:88%;max-width:380px;background:var(--bg);border-radius:20px;
+  padding:24px 20px;box-shadow:0 8px 40px rgba(0,0,0,0.15);
+}
+.hp-modal h3{
+  font-size:14px;color:var(--text);font-weight:600;
+  letter-spacing:2px;margin-bottom:16px;text-align:center;
+}
+.hp-modal label{
+  font-size:10px;color:var(--text-light);letter-spacing:1px;
+  display:block;margin-bottom:4px;margin-top:10px;
+}
+.hp-modal input,.hp-modal textarea,.hp-modal select{
+  width:100%;border:1px solid var(--glass-border);border-radius:10px;
+  padding:10px 12px;font-size:12px;font-family:inherit;
+  background:rgba(255,255,255,.3);color:var(--text);outline:none;box-sizing:border-box;
+}
+.hp-modal-btns{display:flex;gap:10px;margin-top:16px}
+.hp-modal-btns button{
+  flex:1;padding:10px;border-radius:12px;font-size:12px;
+  font-family:inherit;cursor:pointer;letter-spacing:1px;transition:all .15s;
+}
+.hp-modal-btns .cancel{border:1px solid var(--glass-border);background:transparent;color:var(--text-light)}
+.hp-modal-btns .confirm{border:none;background:var(--text);color:white}
+.hp-modal-btns button:active{transform:scale(.97)}
+
+.toast{
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(.8);
+  background:rgba(95,95,95,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  color:white;padding:14px 28px;border-radius:12px;font-size:12px;
+  opacity:0;transition:all .3s;pointer-events:none;z-index:300;
+}
+.toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+</style>
+</head>
+<body>
+
+<div class="hp-header">
+  <a class="hp-back" href="/">←</a>
+  <div class="hp-title">健康中心</div>
+  <div class="hp-subtitle">health</div>
+</div>
+
+<div class="hp-tabs">
+  <div class="hp-tab active" data-tab="period">月经管理</div>
+  <div class="hp-tab" data-tab="body">体态记录</div>
+  <div class="hp-tab" data-tab="meal">吃饭打卡</div>
+</div>
+
+<div class="hp-content">
+
+  <!-- 月经管理 -->
+  <div class="hp-panel active" id="panel-period">
+    <!-- 周期状态 -->
+    <div class="hp-card">
+      <div class="cycle-status">
+        <div class="cycle-day" id="cycleDay">--</div>
+        <div class="cycle-label" id="cycleLabel">loading</div>
+        <div class="cycle-predict" id="cyclePredict"></div>
+        <div class="cycle-avg" id="cycleAvg"></div>
+      </div>
+    </div>
+
+    <!-- 操作按钮 -->
+    <div class="period-actions">
+      <button class="period-btn" onclick="openModal('period-start')">☽ 来了</button>
+      <button class="period-btn end" onclick="openModal('period-end')">结束了</button>
+    </div>
+
+    <!-- 历史记录 -->
+    <div class="hp-card" style="margin-top:14px">
+      <div class="hp-card-title">历史记录</div>
+      <div class="period-history" id="periodHistory"></div>
+    </div>
+  </div>
+
+  <!-- 体态记录 -->
+  <div class="hp-panel" id="panel-body">
+    <!-- 最新数据 -->
+    <div class="body-stat" id="bodyStat">
+      <div class="body-stat-card">
+        <div class="body-stat-value" id="latestWeight">--<span class="body-stat-unit">kg</span></div>
+        <div class="body-stat-label">weight</div>
+        <div class="body-stat-change" id="weightChange"></div>
+      </div>
+      <div class="body-stat-card">
+        <div class="body-stat-value" id="latestHeight">--<span class="body-stat-unit">cm</span></div>
+        <div class="body-stat-label">height</div>
+      </div>
+    </div>
+
+    <!-- 图表 -->
+    <div class="hp-card">
+      <div class="hp-card-title">体重趋势</div>
+      <div class="body-chart" id="bodyChart">
+        <div class="hp-empty">记录两次以上体重后显示趋势图</div>
+      </div>
+    </div>
+
+    <!-- 历史 -->
+    <div class="hp-card">
+      <div class="hp-card-title">记录</div>
+      <div class="body-list" id="bodyList"></div>
+    </div>
+
+    <button class="hp-add-btn" onclick="openModal('body')">+ 记录体重/身高</button>
+  </div>
+
+  <!-- 吃饭打卡 -->
+  <div class="hp-panel" id="panel-meal">
+    <div class="hp-card">
+      <div class="hp-card-title" id="mealDateTitle">今日打卡</div>
+      <div class="meal-grid" id="mealGrid">
+        <div class="meal-slot" id="meal-早餐" onclick="openMeal('早餐')">
+          <div class="meal-icon">🌅</div>
+          <div class="meal-name">早餐</div>
+          <div class="meal-content" id="meal-早餐-content"></div>
+          <div class="meal-check" id="meal-早餐-check"></div>
+        </div>
+        <div class="meal-slot" id="meal-午餐" onclick="openMeal('午餐')">
+          <div class="meal-icon">☀️</div>
+          <div class="meal-name">午餐</div>
+          <div class="meal-content" id="meal-午餐-content"></div>
+          <div class="meal-check" id="meal-午餐-check"></div>
+        </div>
+        <div class="meal-slot" id="meal-晚餐" onclick="openMeal('晚餐')">
+          <div class="meal-icon">🌙</div>
+          <div class="meal-name">晚餐</div>
+          <div class="meal-content" id="meal-晚餐-content"></div>
+          <div class="meal-check" id="meal-晚餐-check"></div>
+        </div>
+        <div class="meal-slot" id="meal-加餐" onclick="openMeal('加餐')">
+          <div class="meal-icon">🍰</div>
+          <div class="meal-name">加餐</div>
+          <div class="meal-content" id="meal-加餐-content"></div>
+          <div class="meal-check" id="meal-加餐-check"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 弹窗 -->
+<div class="hp-modal-overlay" id="modalOverlay">
+  <div class="hp-modal" id="modalContent"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = window.location.origin + "/api";
+
+function callAPI(name, args) {
+  return fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "tools/call", params: { name, arguments: args || {} } })
+  }).then(r => r.json()).then(d => d.result.content[0].text);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+// Tab
+document.querySelectorAll('.hp-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.hp-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.hp-panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('panel-' + tab.dataset.tab).classList.add('active');
+    loadTab(tab.dataset.tab);
+  });
+});
+
+function loadTab(tab) {
+  if (tab === 'period') loadPeriod();
+  else if (tab === 'body') loadBody();
+  else if (tab === 'meal') loadMeals();
+}
+
+// ====== 月经 ======
+async function loadPeriod() {
+  const text = await callAPI('get_period', {});
+  const dayEl = document.getElementById('cycleDay');
+  const labelEl = document.getElementById('cycleLabel');
+  const predictEl = document.getElementById('cyclePredict');
+  const avgEl = document.getElementById('cycleAvg');
+  const histEl = document.getElementById('periodHistory');
+
+  if (text.includes('还没有')) {
+    dayEl.textContent = '☽';
+    labelEl.textContent = '还没有记录';
+    predictEl.textContent = '';
+    avgEl.textContent = '';
+    histEl.innerHTML = '<div class="hp-empty">记录第一次月经后这里会有数据</div>';
+    return;
+  }
+
+  // 解析
+  const dayMatch = text.match(/当前周期第：(\d+)天/);
+  const avgMatch = text.match(/平均周期：(\d+)天/);
+  const predictMatch = text.match(/预测下次：(\S+)/);
+
+  if (dayMatch) {
+    dayEl.textContent = dayMatch[1];
+    labelEl.textContent = 'day of cycle';
+  } else {
+    dayEl.textContent = '☽';
+    labelEl.textContent = '等待更多数据';
+  }
+
+  if (predictMatch) {
+    predictEl.textContent = '预测下次：' + predictMatch[1];
+  }
+  if (avgMatch) {
+    avgEl.textContent = '平均周期 ' + avgMatch[1] + ' 天';
+  }
+
+  // 历史
+  const lines = text.split('\n').filter(l => l.match(/^\d{4}-/));
+  if (lines.length === 0) {
+    histEl.innerHTML = '<div class="hp-empty">暂无历史</div>';
+  } else {
+    histEl.innerHTML = lines.map(l => {
+      const ongoing = l.includes('进行中');
+      if (ongoing) {
+        const date = l.split('（')[0].trim();
+        return `<div class="ph-item"><div class="ph-dates">${date}</div><div class="ph-ongoing">进行中</div></div>`;
+      }
+      const parts = l.match(/(\S+)\s*~\s*(\S+)（(\d+)天）/);
+      if (parts) {
+        return `<div class="ph-item"><div class="ph-dates">${parts[1]} ~ ${parts[2]}</div><div class="ph-days">${parts[3]}天</div></div>`;
+      }
+      return `<div class="ph-item"><div class="ph-dates">${l}</div></div>`;
+    }).join('');
+  }
+}
+
+// ====== 体态 ======
+async function loadBody() {
+  const text = await callAPI('get_body_log', { limit: 10 });
+  const listEl = document.getElementById('bodyList');
+  const chartEl = document.getElementById('bodyChart');
+
+  if (text.includes('还没有')) {
+    document.getElementById('latestWeight').innerHTML = '--<span class="body-stat-unit">kg</span>';
+    document.getElementById('latestHeight').innerHTML = '--<span class="body-stat-unit">cm</span>';
+    document.getElementById('weightChange').textContent = '';
+    listEl.innerHTML = '<div class="hp-empty">还没有记录</div>';
+    chartEl.innerHTML = '<div class="hp-empty">记录两次以上体重后显示趋势图</div>';
+    return;
+  }
+
+  const lines = text.split('\n').filter(l => l.match(/^\d{4}-/));
+  const changeMatch = text.match(/近期变化：([^\n]+)/);
+
+  // 最新数据
+  if (lines.length > 0) {
+    const first = lines[0];
+    const wMatch = first.match(/([\d.]+)kg/);
+    const hMatch = first.match(/([\d.]+)cm/);
+    if (wMatch) document.getElementById('latestWeight').innerHTML = wMatch[1] + '<span class="body-stat-unit">kg</span>';
+    if (hMatch) document.getElementById('latestHeight').innerHTML = hMatch[1] + '<span class="body-stat-unit">cm</span>';
+    if (changeMatch) document.getElementById('weightChange').textContent = changeMatch[1];
+  }
+
+  // 列表
+  listEl.innerHTML = lines.map(l => {
+    const parts = l.split(' | ');
+    const date = parts[0] || '';
+    const values = parts.slice(1).join(' · ');
+    return `<div class="bl-item"><div class="bl-date">${date}</div><div class="bl-values">${values}</div></div>`;
+  }).join('');
+
+  // 图表
+  const weightData = [];
+  const dateLabels = [];
+  lines.reverse().forEach(l => {
+    const wm = l.match(/([\d.]+)kg/);
+    const dm = l.match(/^(\d{4}-\d{2}-\d{2})/);
+    if (wm && dm) {
+      weightData.push(parseFloat(wm[1]));
+      dateLabels.push(dm[1].slice(5));
+    }
+  });
+
+  if (weightData.length >= 2) {
+    const min = Math.min(...weightData) - 1;
+    const max = Math.max(...weightData) + 1;
+    const range = max - min || 1;
+    const w = 320, h = 100, pad = 20;
+    const stepX = (w - pad * 2) / (weightData.length - 1);
+
+    let points = '';
+    let dots = '';
+    let labels = '';
+    let areaPoints = `${pad},${h} `;
+
+    weightData.forEach((v, i) => {
+      const x = pad + i * stepX;
+      const y = h - pad - ((v - min) / range) * (h - pad * 2);
+      points += `${x},${y} `;
+      areaPoints += `${x},${y} `;
+      dots += `<circle class="chart-dot" cx="${x}" cy="${y}" r="3"/>`;
+      labels += `<text class="chart-label" x="${x}" y="${h - 2}">${dateLabels[i]}</text>`;
+    });
+    areaPoints += `${pad + (weightData.length - 1) * stepX},${h}`;
+
+    chartEl.innerHTML = `<svg viewBox="0 0 ${w} ${h + 10}">
+      <defs><linearGradient id="chartGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="rgba(200,180,190,0.4)"/>
+        <stop offset="100%" stop-color="rgba(200,180,190,0)"/>
+      </linearGradient></defs>
+      <polygon class="chart-area" points="${areaPoints}"/>
+      <polyline class="chart-line" points="${points}"/>
+      ${dots}${labels}
+    </svg>`;
+  } else {
+    chartEl.innerHTML = '<div class="hp-empty">记录两次以上体重后显示趋势图</div>';
+  }
+}
+
+// ====== 吃饭打卡 ======
+async function loadMeals() {
+  const text = await callAPI('get_meals', {});
+  const types = ['早餐', '午餐', '晚餐', '加餐'];
+
+  types.forEach(t => {
+    const slot = document.getElementById('meal-' + t);
+    const contentEl = document.getElementById('meal-' + t + '-content');
+    const checkEl = document.getElementById('meal-' + t + '-check');
+    slot.classList.remove('checked');
+    contentEl.textContent = '';
+    checkEl.textContent = '点击打卡';
+  });
+
+  if (text.includes('还没有')) return;
+
+  const lines = text.split('\n');
+  lines.forEach(l => {
+    types.forEach(t => {
+      if (l.includes(t)) {
+        const slot = document.getElementById('meal-' + t);
+        const contentEl = document.getElementById('meal-' + t + '-content');
+        const checkEl = document.getElementById('meal-' + t + '-check');
+        slot.classList.add('checked');
+        const cMatch = l.match(/：(.+)$/);
+        if (cMatch) contentEl.textContent = cMatch[1];
+        checkEl.textContent = '✓ 已打卡';
+      }
+    });
+  });
+}
+
+function openMeal(type) {
+  openModal('meal', type);
+}
+
+// ====== 弹窗 ======
+function openModal(type, extra) {
+  const overlay = document.getElementById('modalOverlay');
+  const content = document.getElementById('modalContent');
+  let html = '';
+
+  if (type === 'period-start') {
+    const today = new Date().toISOString().split('T')[0];
+    html = `<h3>☽ 记录月经</h3>
+      <label>开始日期</label><input type="date" id="psDate" value="${today}">
+      <label>备注（可选）</label><input id="psNotes" placeholder="症状、心情...">
+      <div class="hp-modal-btns">
+        <button class="cancel" onclick="closeModal()">取消</button>
+        <button class="confirm" onclick="submitPeriodStart()">记录</button>
+      </div>`;
+  } else if (type === 'period-end') {
+    const today = new Date().toISOString().split('T')[0];
+    html = `<h3>记录结束</h3>
+      <label>结束日期</label><input type="date" id="peDate" value="${today}">
+      <div class="hp-modal-btns">
+        <button class="cancel" onclick="closeModal()">取消</button>
+        <button class="confirm" onclick="submitPeriodEnd()">确定</button>
+      </div>`;
+  } else if (type === 'body') {
+    const today = new Date().toISOString().split('T')[0];
+    html = `<h3>记录体态</h3>
+      <label>日期</label><input type="date" id="bDate" value="${today}">
+      <label>体重 (kg)</label><input type="number" id="bWeight" step="0.1" placeholder="例如 50.5">
+      <label>身高 (cm)</label><input type="number" id="bHeight" step="0.1" placeholder="例如 165">
+      <label>备注（可选）</label><input id="bNotes" placeholder="状态...">
+      <div class="hp-modal-btns">
+        <button class="cancel" onclick="closeModal()">取消</button>
+        <button class="confirm" onclick="submitBody()">保存</button>
+      </div>`;
+  } else if (type === 'meal') {
+    html = `<h3>${extra}打卡</h3>
+      <label>吃了什么（可选）</label><input id="mlContent" placeholder="今天${extra}吃了...">
+      <label>谁打卡的</label>
+      <select id="mlBy"><option>云云</option><option>哥哥</option></select>
+      <div class="hp-modal-btns">
+        <button class="cancel" onclick="closeModal()">取消</button>
+        <button class="confirm" onclick="submitMeal('${extra}')">打卡</button>
+      </div>`;
+  }
+
+  content.innerHTML = html;
+  overlay.classList.add('show');
+}
+
+function closeModal() { document.getElementById('modalOverlay').classList.remove('show'); }
+document.getElementById('modalOverlay').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+async function submitPeriodStart() {
+  const date = document.getElementById('psDate').value;
+  const notes = document.getElementById('psNotes').value.trim();
+  if (!date) return;
+  await callAPI('log_period', { start_date: date, notes: notes || undefined });
+  closeModal(); showToast('已记录 ✦'); loadPeriod();
+}
+
+async function submitPeriodEnd() {
+  const date = document.getElementById('peDate').value;
+  if (!date) return;
+  await callAPI('end_period', { end_date: date });
+  closeModal(); showToast('已记录结束 ✦'); loadPeriod();
+}
+
+async function submitBody() {
+  const date = document.getElementById('bDate').value;
+  const weight = document.getElementById('bWeight').value;
+  const height = document.getElementById('bHeight').value;
+  const notes = document.getElementById('bNotes').value.trim();
+  if (!weight && !height) return;
+  await callAPI('log_body', {
+    date: date || undefined,
+    weight: weight ? parseFloat(weight) : undefined,
+    height: height ? parseFloat(height) : undefined,
+    notes: notes || undefined
+  });
+  closeModal(); showToast('体态已记录 ✦'); loadBody();
+}
+
+async function submitMeal(type) {
+  const content = document.getElementById('mlContent').value.trim();
+  const by = document.getElementById('mlBy').value;
+  await callAPI('log_meal', { meal_type: type, content: content || undefined, logged_by: by });
+  closeModal(); showToast(type + '打卡成功 ✦'); loadMeals();
+}
+
+// 初始加载
+loadPeriod();
+</script>
+
+</body>
+</html>
