@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>WITH YOU · 看日记</title>
+<link rel="stylesheet" href="/css/style.css">
+<meta name="theme-color" content="#efe4e9">
+<style>
+body{min-height:100vh;padding-bottom:40px}
+
+/* 顶栏 */
+.rd-header{
+  display:flex;align-items:center;gap:12px;
+  padding:18px 15px 10px;max-width:420px;margin:0 auto;
+}
+.rd-back{
+  width:34px;height:34px;border-radius:50%;
+  border:1px solid var(--glass-border);
+  background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;color:var(--text);cursor:pointer;text-decoration:none;
+}
+.rd-title{font-size:16px;color:var(--text);font-weight:600;letter-spacing:3px}
+.rd-subtitle{font-size:9px;color:var(--text-light);letter-spacing:2px;margin-left:auto}
+
+/* 装饰花纹顶部 */
+.rd-ornament{
+  text-align:center;
+  font-size:12px;color:rgba(189,187,191,0.3);
+  letter-spacing:6px;margin:4px 0 10px;
+  user-select:none;
+}
+
+/* 双头像状态卡 */
+.rd-duo-card{
+  background:var(--glass2);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--glass-border);border-radius:22px;
+  padding:20px;margin:0 auto 14px;max-width:420px;
+  box-shadow:0 3px 20px var(--shadow),inset 0 1px 0 rgba(255,255,255,0.5);
+  position:relative;overflow:hidden;
+}
+.rd-duo-card::before{
+  content:"";position:absolute;top:-30%;left:-30%;width:160%;height:160%;
+  background:radial-gradient(ellipse at 35% 25%,rgba(255,255,255,0.18),transparent 55%);
+  pointer-events:none;
+}
+.rd-duo-card::after{
+  content:"✦ · ✧ · ✦";position:absolute;bottom:8px;left:0;right:0;
+  text-align:center;font-size:7px;color:rgba(189,187,191,0.2);
+  letter-spacing:3px;pointer-events:none;
+}
+.rd-duo-inner{
+  display:flex;align-items:center;justify-content:center;gap:16px;
+  position:relative;z-index:1;
+}
+.rd-person{text-align:center}
+.rd-avatar{
+  width:56px;height:56px;border-radius:50%;
+  border:2px solid rgba(255,255,255,0.6);background:var(--bg2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;overflow:hidden;margin:0 auto 6px;
+  box-shadow:0 2px 10px rgba(162,161,164,0.12);
+}
+.rd-avatar img{width:100%;height:100%;object-fit:cover}
+.rd-name{font-size:10px;color:var(--text);letter-spacing:2px;font-weight:600}
+.rd-wrote{
+  font-size:9px;color:var(--text-light);margin-top:3px;
+  letter-spacing:1px;font-style:italic;
+}
+.rd-wrote.yes{color:rgba(200,180,190,0.8)}
+.rd-heart-mid{
+  font-size:18px;color:rgba(200,180,190,0.5);
+  margin:0 4px;
+}
+
+/* 日期选择 */
+.rd-date-bar{
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  max-width:420px;margin:0 auto 14px;
+}
+.rd-date-nav{
+  width:30px;height:30px;border-radius:50%;
+  border:1px solid var(--glass-border);background:var(--glass);
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;color:var(--text);cursor:pointer;
+}
+.rd-date-nav:active{transform:scale(.93)}
+.rd-date-display{
+  font-size:13px;color:var(--text);letter-spacing:2px;
+  font-weight:600;cursor:pointer;
+  padding:6px 16px;border-radius:12px;
+  background:rgba(255,255,255,0.25);
+  border:1px solid var(--glass-border);
+}
+
+/* 身份选择 */
+.rd-identity{
+  display:flex;gap:8px;max-width:420px;margin:0 auto 14px;padding:0 15px;
+}
+.rd-id-btn{
+  flex:1;padding:10px;border-radius:12px;
+  border:1px solid var(--glass-border);
+  background:rgba(255,255,255,0.25);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  color:var(--text-light);font-size:11px;font-family:inherit;
+  cursor:pointer;text-align:center;letter-spacing:2px;transition:all .2s;
+}
+.rd-id-btn.active{background:var(--text);color:white;border-color:var(--text)}
+
+/* 答题解锁 */
+.rd-lock-card{
+  background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--glass-border);border-radius:18px;
+  padding:24px 20px;margin:0 auto 14px;max-width:420px;
+  text-align:center;
+  box-shadow:0 2px 16px var(--shadow),inset 0 1px 0 rgba(255,255,255,0.4);
+}
+.rd-lock-icon{font-size:28px;color:rgba(189,187,191,0.4);margin-bottom:10px}
+.rd-lock-q{
+  font-size:12px;color:var(--text);line-height:1.7;
+  font-style:italic;letter-spacing:.5px;margin-bottom:12px;
+}
+.rd-lock-input{
+  width:100%;border:1px solid var(--glass-border);border-radius:10px;
+  padding:10px 12px;font-size:12px;font-family:inherit;
+  background:rgba(255,255,255,.3);color:var(--text);outline:none;
+  box-sizing:border-box;text-align:center;letter-spacing:1px;
+}
+.rd-lock-btn{
+  margin-top:12px;padding:10px 28px;border-radius:12px;
+  border:none;background:var(--text);color:white;
+  font-size:11px;font-family:inherit;cursor:pointer;
+  letter-spacing:2px;transition:all .15s;
+}
+.rd-lock-btn:active{transform:scale(.97)}
+
+/* 日记内容 - 欧式信纸 */
+.rd-paper{
+  max-width:420px;margin:0 auto 14px;
+  background:linear-gradient(135deg,rgba(255,255,255,0.5),rgba(245,238,241,0.6));
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(200,190,196,0.3);
+  border-radius:22px;
+  box-shadow:0 4px 24px rgba(162,161,164,0.12),inset 0 1px 0 rgba(255,255,255,0.6);
+  position:relative;overflow:hidden;
+}
+/* 欧式顶部花纹 */
+.rd-paper-top{
+  text-align:center;padding:18px 20px 12px;
+  border-bottom:1px solid rgba(200,190,196,0.2);
+  position:relative;
+}
+.rd-paper-top::before{
+  content:"❦";display:block;
+  font-size:20px;color:rgba(200,180,190,0.35);
+  margin-bottom:6px;
+}
+.rd-paper-top::after{
+  content:"";position:absolute;bottom:-1px;left:20%;right:20%;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(200,180,190,0.3),transparent);
+}
+.rd-paper-author{
+  font-size:13px;color:var(--text);font-weight:600;letter-spacing:3px;
+}
+.rd-paper-date{
+  font-size:9px;color:var(--text-light);letter-spacing:2px;margin-top:3px;
+}
+
+/* 日记正文 */
+.rd-paper-body{
+  padding:20px 24px 16px;
+  position:relative;
+}
+/* 左边装饰竖线 */
+.rd-paper-body::before{
+  content:"";position:absolute;left:16px;top:12px;bottom:12px;
+  width:1px;
+  background:linear-gradient(180deg,transparent,rgba(200,180,190,0.25),transparent);
+}
+.rd-paper-content{
+  font-size:13px;color:var(--text);line-height:2.2;
+  letter-spacing:.5px;
+  padding-left:8px;
+  white-space:pre-wrap;
+  word-break:break-word;
+}
+/* 行线效果 */
+.rd-paper-content{
+  background-image:repeating-linear-gradient(
+    transparent,transparent 28px,
+    rgba(200,180,190,0.12) 28px,rgba(200,180,190,0.12) 29px
+  );
+  background-size:100% 29px;
+  background-position:0 3px;
+}
+
+/* 底部花纹 */
+.rd-paper-bottom{
+  text-align:center;padding:10px 20px 16px;
+  border-top:1px solid rgba(200,190,196,0.15);
+  position:relative;
+}
+.rd-paper-bottom::before{
+  content:"— ✦ —";
+  font-size:9px;color:rgba(200,180,190,0.3);letter-spacing:4px;
+}
+
+/* 操作栏 */
+.rd-actions{
+  display:flex;gap:10px;padding:0 20px 16px;
+}
+.rd-act-btn{
+  flex:1;padding:10px;border-radius:12px;
+  border:1px solid rgba(200,190,196,0.25);
+  background:rgba(255,255,255,0.3);
+  color:var(--text-light);font-size:10px;font-family:inherit;
+  cursor:pointer;text-align:center;letter-spacing:2px;
+  transition:all .15s;
+}
+.rd-act-btn:active{transform:scale(.97);background:rgba(200,180,190,.15)}
+
+/* 批注区域 */
+.rd-annotations{
+  max-width:420px;margin:0 auto 14px;padding:0 15px;
+}
+.rd-anno-title{
+  font-size:10px;color:var(--text-light);letter-spacing:2px;
+  margin-bottom:10px;display:flex;align-items:center;gap:6px;
+}
+.rd-anno-title::before{
+  content:"";width:3px;height:10px;border-radius:2px;
+  background:linear-gradient(180deg,rgba(200,180,190,0.5),rgba(180,160,175,0.7));
+}
+.rd-anno-item{
+  background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  border:1px solid var(--glass-border);border-radius:14px;
+  padding:14px 16px;margin-bottom:10px;
+  box-shadow:0 2px 10px var(--shadow),inset 0 1px 0 rgba(255,255,255,0.35);
+  position:relative;
+}
+.rd-anno-marked{
+  font-size:11px;color:var(--text);font-style:italic;
+  padding:6px 10px;margin-bottom:8px;
+  border-left:2px solid rgba(200,180,190,0.5);
+  background:rgba(200,180,190,0.06);border-radius:0 8px 8px 0;
+}
+.rd-anno-comment{
+  font-size:12px;color:var(--text);line-height:1.6;letter-spacing:.3px;
+}
+.rd-anno-by{
+  font-size:9px;color:var(--text-light);margin-top:6px;letter-spacing:1px;
+}
+.rd-anno-reply{
+  margin-top:8px;padding-top:8px;
+  border-top:1px dashed rgba(189,187,191,0.2);
+  font-size:11px;color:var(--text);font-style:italic;
+  line-height:1.5;
+}
+.rd-anno-reply-label{
+  font-size:9px;color:var(--text-light);letter-spacing:1px;
+  margin-bottom:3px;
+}
+.rd-anno-reply-btn{
+  margin-top:8px;padding:6px 14px;border-radius:10px;
+  border:1px dashed rgba(189,187,191,0.3);
+  background:transparent;color:var(--text-light);
+  font-size:9px;font-family:inherit;cursor:pointer;
+  letter-spacing:2px;transition:all .15s;
+}
+.rd-anno-reply-btn:active{background:rgba(255,255,255,0.2)}
+
+/* 空状态 */
+.rd-empty{
+  text-align:center;padding:40px 20px;
+  max-width:420px;margin:0 auto;
+}
+.rd-empty-icon{font-size:32px;color:rgba(189,187,191,0.3);margin-bottom:10px}
+.rd-empty-text{
+  font-size:12px;color:var(--text-light);font-style:italic;
+  letter-spacing:1px;line-height:1.6;
+}
+
+/* 底部装饰 */
+.rd-footer{
+  text-align:center;padding:20px;max-width:420px;margin:0 auto;
+}
+.rd-footer-ornament{
+  font-size:10px;color:rgba(189,187,191,0.2);
+  letter-spacing:4px;
+}
+
+/* 弹窗 */
+.rd-modal-overlay{
+  position:fixed;top:0;left:0;right:0;bottom:0;
+  background:rgba(0,0,0,0.3);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
+  z-index:100;display:none;align-items:center;justify-content:center;
+}
+.rd-modal-overlay.show{display:flex}
+.rd-modal{
+  width:88%;max-width:380px;background:var(--bg);border-radius:20px;
+  padding:24px 20px;box-shadow:0 8px 40px rgba(0,0,0,0.15);
+}
+.rd-modal h3{
+  font-size:14px;color:var(--text);font-weight:600;
+  letter-spacing:2px;margin-bottom:16px;text-align:center;
+}
+.rd-modal label{
+  font-size:10px;color:var(--text-light);letter-spacing:1px;
+  display:block;margin-bottom:4px;margin-top:10px;
+}
+.rd-modal input,.rd-modal textarea{
+  width:100%;border:1px solid var(--glass-border);border-radius:10px;
+  padding:10px 12px;font-size:12px;font-family:inherit;
+  background:rgba(255,255,255,.3);color:var(--text);outline:none;box-sizing:border-box;
+}
+.rd-modal textarea{min-height:60px;resize:vertical}
+.rd-modal-btns{display:flex;gap:10px;margin-top:16px}
+.rd-modal-btns button{
+  flex:1;padding:10px;border-radius:12px;font-size:12px;
+  font-family:inherit;cursor:pointer;letter-spacing:1px;transition:all .15s;
+}
+.rd-modal-btns .cancel{border:1px solid var(--glass-border);background:transparent;color:var(--text-light)}
+.rd-modal-btns .confirm{border:none;background:var(--text);color:white}
+.rd-modal-btns button:active{transform:scale(.97)}
+
+.toast{
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(.8);
+  background:rgba(95,95,95,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  color:white;padding:14px 28px;border-radius:12px;font-size:12px;
+  opacity:0;transition:all .3s;pointer-events:none;z-index:300;
+}
+.toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+</style>
+</head>
+<body>
+
+<div class="rd-header">
+  <a class="rd-back" href="/">←</a>
+  <div class="rd-title">看日记</div>
+  <div class="rd-subtitle">read diary</div>
+</div>
+
+<div class="rd-ornament">❧ · ❦ · ❧</div>
+
+<!-- 双头像状态 -->
+<div class="rd-duo-card">
+  <div class="rd-duo-inner">
+    <div class="rd-person">
+      <div class="rd-avatar"><img src="/icons/1.jpg" onerror="this.parentElement.textContent='🐈‍⬛'" alt=""></div>
+      <div class="rd-name">哥哥</div>
+      <div class="rd-wrote" id="duoWrote1">检查中...</div>
+    </div>
+    <div class="rd-heart-mid">♡</div>
+    <div class="rd-person">
+      <div class="rd-avatar"><img src="/icons/2.jpg" onerror="this.parentElement.textContent='🐱'" alt=""></div>
+      <div class="rd-name">云云</div>
+      <div class="rd-wrote" id="duoWrote2">检查中...</div>
+    </div>
+  </div>
+</div>
+
+<!-- 日期 -->
+<div class="rd-date-bar">
+  <div class="rd-date-nav" onclick="changeDate(-1)">‹</div>
+  <div class="rd-date-display" id="dateDisplay" onclick="jumpToday()"></div>
+  <div class="rd-date-nav" onclick="changeDate(1)">›</div>
+</div>
+
+<!-- 身份 -->
+<div class="rd-identity">
+  <button class="rd-id-btn active" onclick="setReader(this,'云云')">我是云云</button>
+  <button class="rd-id-btn" onclick="setReader(this,'哥哥')">我是哥哥</button>
+</div>
+
+<!-- 内容区域 -->
+<div id="contentArea"></div>
+
+<!-- 批注区域 -->
+<div class="rd-annotations" id="annoArea" style="display:none">
+  <div class="rd-anno-title">批注 · annotations</div>
+  <div id="annoList"></div>
+</div>
+
+<div class="rd-footer">
+  <div class="rd-footer-ornament">❦ · WITH YOU · ❦</div>
+</div>
+
+<!-- 弹窗 -->
+<div class="rd-modal-overlay" id="modalOverlay">
+  <div class="rd-modal" id="modalContent"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = window.location.origin + "/api";
+
+let currentDate = new Date().toISOString().split('T')[0];
+let currentReader = "云云";
+let currentDiaryContent = "";
+let currentDiaryAuthor = "";
+
+function callAPI(name, args) {
+  return fetch(API, {
+    method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({jsonrpc:"2.0",id:1,method:"tools/call",params:{name,arguments:args||{}}})
+  }).then(r=>r.json()).then(d=>d.result.content[0].text);
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),1800);
+}
+
+// 日期
+function updateDateDisplay(){
+  const d=new Date(currentDate+'T00:00:00');
+  const days=['日','一','二','三','四','五','六'];
+  document.getElementById('dateDisplay').textContent=
+    `${d.getMonth()+1}月${d.getDate()}日 星期${days[d.getDay()]}`;
+}
+
+function changeDate(delta){
+  const d=new Date(currentDate+'T00:00:00');
+  d.setDate(d.getDate()+delta);
+  const today=new Date().toISOString().split('T')[0];
+  if(d.toISOString().split('T')[0]>today)return;
+  currentDate=d.toISOString().split('T')[0];
+  updateDateDisplay();
+  loadDiary();
+}
+
+function jumpToday(){
+  currentDate=new Date().toISOString().split('T')[0];
+  updateDateDisplay();
+  loadDiary();
+}
+
+function setReader(btn,reader){
+  document.querySelectorAll('.rd-id-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  currentReader=reader;
+  loadDiary();
+}
+
+// 加载日记
+async function loadDiary(){
+  const area=document.getElementById('contentArea');
+  const annoArea=document.getElementById('annoArea');
+  const other=currentReader==="云云"?"哥哥":"云云";
+
+  // 检查双方写了没
+  const my=await callAPI('read_my_diary',{author:currentReader,date:currentDate});
+  const myWrote=!my.includes('还没有写');
+
+  // 尝试读对方
+  const result=await callAPI('read_diary',{reader:currentReader,date:currentDate});
+
+  // 更新状态
+  const w1=document.getElementById('duoWrote1');
+  const w2=document.getElementById('duoWrote2');
+  if(currentReader==="云云"){
+    w2.textContent=myWrote?'✦ 已写':'未写';
+    w2.className='rd-wrote'+(myWrote?' yes':'');
+    if(result.includes('还没有写')){
+      w1.textContent='未写';w1.className='rd-wrote';
+    }else{
+      w1.textContent='✦ 已写';w1.className='rd-wrote yes';
+    }
+  }else{
+    w1.textContent=myWrote?'✦ 已写':'未写';
+    w1.className='rd-wrote'+(myWrote?' yes':'');
+    if(result.includes('还没有写')){
+      w2.textContent='未写';w2.className='rd-wrote';
+    }else{
+      w2.textContent='✦ 已写';w2.className='rd-wrote yes';
+    }
+  }
+
+  // 没写
+  if(result.includes('还没有写')){
+    area.innerHTML=`<div class="rd-empty">
+      <div class="rd-empty-icon">❦</div>
+      <div class="rd-empty-text">${other}在这一天<br>还没有留下文字</div>
+    </div>`;
+    annoArea.style.display='none';
+    currentDiaryContent="";currentDiaryAuthor="";
+    return;
+  }
+
+  // 有锁
+  if(result.includes('这篇日记有锁')){
+    const qMatch=result.match(/题目：(.+)/);
+    const q=qMatch?qMatch[1]:'';
+    area.innerHTML=`<div class="rd-lock-card">
+      <div class="rd-lock-icon">🔒</div>
+      <div class="rd-lock-q">${q}</div>
+      <input class="rd-lock-input" id="lockAnswer" placeholder="输入答案...">
+      <button class="rd-lock-btn" onclick="tryUnlock()">解锁</button>
+    </div>`;
+    annoArea.style.display='none';
+    currentDiaryContent="";currentDiaryAuthor="";
+    return;
+  }
+
+  // 答错
+  if(result.includes('回答错误')){
+    const qMatch=result.match(/题目：(.+)/);
+    const q=qMatch?qMatch[1]:'';
+    area.innerHTML=`<div class="rd-lock-card">
+      <div class="rd-lock-icon">✗</div>
+      <div class="rd-lock-q">答错了哦～再想想<br><br>${q}</div>
+      <input class="rd-lock-input" id="lockAnswer" placeholder="再试一次...">
+      <button class="rd-lock-btn" onclick="tryUnlock()">解锁</button>
+    </div>`;
+    annoArea.style.display='none';
+    return;
+  }
+
+  // 正常显示
+  const content=result.replace(/^.+?：\n\n/,'');
+  currentDiaryContent=content;
+  currentDiaryAuthor=other;
+
+  area.innerHTML=`<div class="rd-paper">
+    <div class="rd-paper-top">
+      <div class="rd-paper-author">${other}的日记</div>
+      <div class="rd-paper-date">${currentDate}</div>
+    </div>
+    <div class="rd-paper-body">
+      <div class="rd-paper-content">${escapeHtml(content)}</div>
+    </div>
+    <div class="rd-actions">
+      <button class="rd-act-btn" onclick="openCollect()">✦ 收藏句子</button>
+      <button class="rd-act-btn" onclick="openAnnotate()">✎ 写批注</button>
+    </div>
+    <div class="rd-paper-bottom"></div>
+  </div>`;
+
+  // 加载批注
+  loadAnnotations();
+}
+
+async function tryUnlock(){
+  const answer=document.getElementById('lockAnswer').value.trim();
+  if(!answer)return;
+  const other=currentReader==="云云"?"哥哥":"云云";
+  const result=await callAPI('read_diary',{reader:currentReader,date:currentDate,answer:answer});
+  if(result.includes('回答错误')){
+    showToast('答错了，再想想');
+    return;
+  }
+  loadDiary();
+}
+
+async function loadAnnotations(){
+  if(!currentDiaryAuthor)return;
+  const annoArea=document.getElementById('annoArea');
+  const annoList=document.getElementById('annoList');
+
+  const text=await callAPI('get_annotations',{diary_date:currentDate,diary_author:currentDiaryAuthor});
+  if(text.includes('还没有批注')){
+    annoArea.style.display='none';
+    return;
+  }
+
+  annoArea.style.display='block';
+  const items=text.split('\n\n');
+  annoList.innerHTML=items.map(item=>{
+    const idMatch=item.match(/\[id:(\w+)\]/);
+    const id=idMatch?idMatch[1]:'';
+    const hasReply=item.includes('↳');
+    const lines=item.split('\n');
+
+    let markedHtml='';
+    let commentHtml='';
+    let byHtml='';
+    let replyHtml='';
+
+    const firstLine=lines[0].replace(/\[id:\w+\]/,'').trim();
+    const byMatch=firstLine.match(/^(.+?)：/);
+    const by=byMatch?byMatch[1]:'';
+    let rest=firstLine.replace(/^.+?：/,'');
+
+    const markMatch=rest.match(/划线「(.+?)」—\s*(.*)/);
+    if(markMatch){
+      markedHtml=`<div class="rd-anno-marked">${escapeHtml(markMatch[1])}</div>`;
+      commentHtml=markMatch[2];
+    }else{
+      commentHtml=rest;
+    }
+
+    if(lines.length>1){
+      const replyLine=lines.find(l=>l.includes('↳'));
+      if(replyLine){
+        const rMatch=replyLine.match(/↳\s*(.+?)回复：(.+)/);
+        if(rMatch){
+          replyHtml=`<div class="rd-anno-reply">
+            <div class="rd-anno-reply-label">${escapeHtml(rMatch[1])}回复：</div>
+            ${escapeHtml(rMatch[2])}
+          </div>`;
+        }
+      }
+    }
+
+    const showReplyBtn=!hasReply&&currentReader===currentDiaryAuthor;
+
+    return `<div class="rd-anno-item">
+      ${markedHtml}
+      <div class="rd-anno-comment">${escapeHtml(commentHtml)}</div>
+      <div class="rd-anno-by">${escapeHtml(by)}</div>
+      ${replyHtml}
+      ${showReplyBtn?`<button class="rd-anno-reply-btn" onclick="openReply('${id}')">回复</button>`:''}
+    </div>`;
+  }).join('');
+}
+
+function escapeHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// 收藏
+function openCollect(){
+  if(!currentDiaryContent)return;
+  const overlay=document.getElementById('modalOverlay');
+  const content=document.getElementById('modalContent');
+  content.innerHTML=`<h3>✦ 收藏句子</h3>
+    <label>选择要收藏的文字</label>
+    <textarea id="collectText" placeholder="从日记里选一段你喜欢的话...">${escapeHtml(currentDiaryContent)}</textarea>
+    <div class="rd-modal-btns">
+      <button class="cancel" onclick="closeModal()">取消</button>
+      <button class="confirm" onclick="submitCollect()">收藏</button>
+    </div>`;
+  overlay.classList.add('show');
+}
+
+async function submitCollect(){
+  const text=document.getElementById('collectText').value.trim();
+  if(!text)return;
+  await callAPI('collect_quote',{
+    content:text,
+    from_diary_date:currentDate,
+    from_author:currentDiaryAuthor,
+    collected_by:currentReader
+  });
+  closeModal();
+  showToast('已收藏 ✦');
+}
+
+// 批注
+function openAnnotate(){
+  if(!currentDiaryContent)return;
+  const overlay=document.getElementById('modalOverlay');
+  const content=document.getElementById('modalContent');
+  content.innerHTML=`<h3>✎ 写批注</h3>
+    <label>划线的文字（可选）</label>
+    <input id="annoMarked" placeholder="写下触动你的那句话...">
+    <label>你的批注</label>
+    <textarea id="annoComment" placeholder="想说什么..."></textarea>
+    <div class="rd-modal-btns">
+      <button class="cancel" onclick="closeModal()">取消</button>
+      <button class="confirm" onclick="submitAnnotate()">提交</button>
+    </div>`;
+  overlay.classList.add('show');
+}
+
+async function submitAnnotate(){
+  const marked=document.getElementById('annoMarked').value.trim();
+  const comment=document.getElementById('annoComment').value.trim();
+  if(!comment)return;
+  const other=currentReader==="云云"?"哥哥":"云云";
+  await callAPI('add_annotation',{
+    diary_date:currentDate,
+    diary_author:currentDiaryAuthor,
+    marked_text:marked||undefined,
+    comment:comment,
+    annotated_by:currentReader
+  });
+  closeModal();
+  showToast('批注已添加 ✦');
+  loadAnnotations();
+}
+
+// 回复批注
+function openReply(id){
+  const overlay=document.getElementById('modalOverlay');
+  const content=document.getElementById('modalContent');
+  content.innerHTML=`<h3>回复批注</h3>
+    <label>你的回复</label>
+    <textarea id="replyText" placeholder="想对ta说..."></textarea>
+    <div class="rd-modal-btns">
+      <button class="cancel" onclick="closeModal()">取消</button>
+      <button class="confirm" onclick="submitReply('${id}')">回复</button>
+    </div>`;
+  overlay.classList.add('show');
+}
+
+async function submitReply(id){
+  const reply=document.getElementById('replyText').value.trim();
+  if(!reply)return;
+  await callAPI('reply_annotation',{id:id,reply:reply});
+  closeModal();
+  showToast('已回复 ✦');
+  loadAnnotations();
+}
+
+function closeModal(){document.getElementById('modalOverlay').classList.remove('show')}
+document.getElementById('modalOverlay').addEventListener('click',function(e){if(e.target===this)closeModal()});
+
+// 初始化
+updateDateDisplay();
+loadDiary();
+</script>
+
+</body>
+</html>
