@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>WITH YOU · 写日记</title>
+<link rel="stylesheet" href="/css/style.css">
+<meta name="theme-color" content="#efe4e9">
+<style>
+body{min-height:100vh;padding-bottom:40px}
+
+.wd-header{
+  display:flex;align-items:center;gap:12px;
+  padding:18px 15px 10px;max-width:420px;margin:0 auto;
+}
+.wd-back{
+  width:34px;height:34px;border-radius:50%;
+  border:1px solid var(--glass-border);
+  background:var(--glass);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;color:var(--text);cursor:pointer;text-decoration:none;
+}
+.wd-title{font-size:16px;color:var(--text);font-weight:600;letter-spacing:3px}
+.wd-subtitle{font-size:9px;color:var(--text-light);letter-spacing:2px;margin-left:auto}
+
+.wd-ornament{
+  text-align:center;font-size:12px;color:rgba(189,187,191,0.3);
+  letter-spacing:6px;margin:4px 0 10px;user-select:none;
+}
+
+/* 身份选择 */
+.wd-identity{
+  display:flex;gap:8px;max-width:420px;margin:0 auto 14px;padding:0 15px;
+}
+.wd-id-btn{
+  flex:1;padding:10px;border-radius:12px;
+  border:1px solid var(--glass-border);
+  background:rgba(255,255,255,0.25);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  color:var(--text-light);font-size:11px;font-family:inherit;
+  cursor:pointer;text-align:center;letter-spacing:2px;transition:all .2s;
+}
+.wd-id-btn.active{background:var(--text);color:white;border-color:var(--text)}
+
+/* 信纸 */
+.wd-paper{
+  max-width:420px;margin:0 auto 14px;
+  background:linear-gradient(135deg,rgba(255,255,255,0.5),rgba(245,238,241,0.6));
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid rgba(200,190,196,0.3);
+  border-radius:22px;
+  box-shadow:0 4px 24px rgba(162,161,164,0.12),inset 0 1px 0 rgba(255,255,255,0.6);
+  position:relative;overflow:hidden;
+}
+.wd-paper-top{
+  text-align:center;padding:18px 20px 12px;
+  border-bottom:1px solid rgba(200,190,196,0.2);
+  position:relative;
+}
+.wd-paper-top::before{
+  content:"❦";display:block;
+  font-size:20px;color:rgba(200,180,190,0.35);
+  margin-bottom:6px;
+}
+.wd-paper-top::after{
+  content:"";position:absolute;bottom:-1px;left:20%;right:20%;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(200,180,190,0.3),transparent);
+}
+.wd-paper-label{
+  font-size:13px;color:var(--text);font-weight:600;letter-spacing:3px;
+}
+.wd-paper-date{
+  font-size:9px;color:var(--text-light);letter-spacing:2px;margin-top:3px;
+}
+
+/* 写字区域 */
+.wd-paper-body{
+  padding:16px 20px;position:relative;
+}
+.wd-paper-body::before{
+  content:"";position:absolute;left:16px;top:12px;bottom:12px;
+  width:1px;
+  background:linear-gradient(180deg,transparent,rgba(200,180,190,0.25),transparent);
+}
+.wd-textarea{
+  width:100%;min-height:240px;
+  border:none;outline:none;resize:vertical;
+  background:transparent;
+  font-size:13px;color:var(--text);
+  font-family:"Noto Serif SC","PingFang SC",serif;
+  line-height:2.2;letter-spacing:.5px;
+  padding:0 4px 0 10px;
+  background-image:repeating-linear-gradient(
+    transparent,transparent 28px,
+    rgba(200,180,190,0.12) 28px,rgba(200,180,190,0.12) 29px
+  );
+  background-size:100% 29px;
+  background-position:0 3px;
+  box-sizing:border-box;
+}
+.wd-textarea::placeholder{
+  color:var(--text-light);font-style:italic;opacity:0.6;
+}
+
+/* 字数统计 */
+.wd-char-count{
+  text-align:right;padding:0 24px 8px;
+  font-size:9px;color:var(--text-light);letter-spacing:1px;
+}
+
+/* 题目锁区域 */
+.wd-lock-section{
+  padding:0 20px 16px;
+  border-top:1px dashed rgba(200,190,196,0.2);
+  margin-top:4px;
+}
+.wd-lock-toggle{
+  display:flex;align-items:center;gap:8px;
+  padding:12px 0 8px;cursor:pointer;
+}
+.wd-lock-checkbox{
+  width:18px;height:18px;border-radius:6px;
+  border:1.5px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;color:transparent;transition:all .2s;
+  flex-shrink:0;
+}
+.wd-lock-checkbox.checked{
+  background:var(--text);border-color:var(--text);color:white;
+}
+.wd-lock-label{
+  font-size:10px;color:var(--text-light);letter-spacing:1px;
+  font-style:italic;
+}
+.wd-lock-fields{
+  display:none;padding-top:8px;
+}
+.wd-lock-fields.show{display:block}
+.wd-lock-fields input{
+  width:100%;border:1px solid var(--glass-border);border-radius:10px;
+  padding:10px 12px;font-size:12px;font-family:inherit;
+  background:rgba(255,255,255,.3);color:var(--text);outline:none;
+  box-sizing:border-box;margin-bottom:8px;
+}
+.wd-lock-fields input::placeholder{color:var(--text-light);font-style:italic}
+
+/* 底部 */
+.wd-paper-bottom{
+  text-align:center;padding:10px 20px 16px;
+  border-top:1px solid rgba(200,190,196,0.15);
+  position:relative;
+}
+.wd-paper-bottom::before{
+  content:"— ✦ —";
+  font-size:9px;color:rgba(200,180,190,0.3);letter-spacing:4px;
+}
+
+/* 提交按钮 */
+.wd-submit-wrap{
+  max-width:420px;margin:0 auto;padding:0 15px;
+}
+.wd-submit{
+  width:100%;padding:14px;border-radius:16px;
+  border:none;
+  background:linear-gradient(135deg,rgba(200,180,190,0.4),rgba(180,160,175,0.5));
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  color:var(--text);font-size:12px;font-family:inherit;
+  cursor:pointer;letter-spacing:3px;font-weight:600;
+  transition:all .2s;
+  box-shadow:0 3px 16px rgba(162,161,164,0.15);
+}
+.wd-submit:active{transform:scale(.98);box-shadow:0 1px 8px rgba(162,161,164,0.1)}
+
+/* 今日已写提示 */
+.wd-already{
+  max-width:420px;margin:14px auto;
+  background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--glass-border);border-radius:16px;
+  padding:16px 18px;text-align:center;
+  box-shadow:0 2px 12px var(--shadow),inset 0 1px 0 rgba(255,255,255,0.4);
+}
+.wd-already-icon{font-size:20px;color:rgba(200,180,190,0.5);margin-bottom:6px}
+.wd-already-text{font-size:11px;color:var(--text-light);letter-spacing:1px;font-style:italic;line-height:1.6}
+
+/* 打卡提示 */
+.wd-streak{
+  max-width:420px;margin:14px auto;padding:0 15px;
+  text-align:center;
+}
+.wd-streak-text{
+  font-size:10px;color:var(--text-light);letter-spacing:2px;
+  font-style:italic;
+}
+
+.wd-footer{
+  text-align:center;padding:20px;max-width:420px;margin:0 auto;
+}
+.wd-footer-ornament{
+  font-size:10px;color:rgba(189,187,191,0.2);letter-spacing:4px;
+}
+
+.toast{
+  position:fixed;top:50%;left:50%;
+  transform:translate(-50%,-50%) scale(.8);
+  background:rgba(95,95,95,.85);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+  color:white;padding:14px 28px;border-radius:12px;font-size:12px;
+  opacity:0;transition:all .3s;pointer-events:none;z-index:300;
+}
+.toast.show{opacity:1;transform:translate(-50%,-50%) scale(1)}
+</style>
+</head>
+<body>
+
+<div class="wd-header">
+  <a class="wd-back" href="/">←</a>
+  <div class="wd-title">写日记</div>
+  <div class="wd-subtitle">write diary</div>
+</div>
+
+<div class="wd-ornament">❧ · ❦ · ❧</div>
+
+<!-- 身份 -->
+<div class="wd-identity">
+  <button class="wd-id-btn active" onclick="setAuthor(this,'云云')">云云</button>
+  <button class="wd-id-btn" onclick="setAuthor(this,'哥哥')">哥哥</button>
+</div>
+
+<!-- 已写检查 -->
+<div id="alreadyArea"></div>
+
+<!-- 信纸 -->
+<div class="wd-paper" id="paperArea">
+  <div class="wd-paper-top">
+    <div class="wd-paper-label" id="paperLabel">云云的日记</div>
+    <div class="wd-paper-date" id="paperDate"></div>
+  </div>
+  <div class="wd-paper-body">
+    <textarea class="wd-textarea" id="diaryText" placeholder="今天想写些什么..."></textarea>
+  </div>
+  <div class="wd-char-count"><span id="charCount">0</span> 字</div>
+
+  <!-- 题目锁 -->
+  <div class="wd-lock-section">
+    <div class="wd-lock-toggle" onclick="toggleLock()">
+      <div class="wd-lock-checkbox" id="lockCheck"></div>
+      <div class="wd-lock-label">给对方设一道题 🔒</div>
+    </div>
+    <div class="wd-lock-fields" id="lockFields">
+      <input id="lockQuestion" placeholder="题目...">
+      <input id="lockAnswer" placeholder="答案...">
+    </div>
+  </div>
+
+  <div class="wd-paper-bottom"></div>
+</div>
+
+<!-- 提交 -->
+<div class="wd-submit-wrap" id="submitWrap">
+  <button class="wd-submit" onclick="submitDiary()">落笔 ✦</button>
+</div>
+
+<!-- 打卡 -->
+<div class="wd-streak" id="streakArea"></div>
+
+<div class="wd-footer">
+  <div class="wd-footer-ornament">❦ · WITH YOU · ❦</div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = window.location.origin + "/api";
+let currentAuthor = "云云";
+let lockEnabled = false;
+
+function callAPI(name, args) {
+  return fetch(API, {
+    method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({jsonrpc:"2.0",id:1,method:"tools/call",params:{name,arguments:args||{}}})
+  }).then(r=>r.json()).then(d=>d.result.content[0].text);
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),1800);
+}
+
+// 日期
+function updateDate(){
+  const now=new Date();
+  const days=['日','一','二','三','四','五','六'];
+  document.getElementById('paperDate').textContent=
+    `${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 星期${days[now.getDay()]}`;
+}
+
+// 身份
+function setAuthor(btn, author){
+  document.querySelectorAll('.wd-id-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  currentAuthor = author;
+  document.getElementById('paperLabel').textContent = author + '的日记';
+  checkAlready();
+}
+
+// 字数
+document.getElementById('diaryText').addEventListener('input', function(){
+  document.getElementById('charCount').textContent = this.value.length;
+});
+
+// 题目锁
+function toggleLock(){
+  lockEnabled = !lockEnabled;
+  const check = document.getElementById('lockCheck');
+  const fields = document.getElementById('lockFields');
+  check.classList.toggle('checked', lockEnabled);
+  check.textContent = lockEnabled ? '✓' : '';
+  fields.classList.toggle('show', lockEnabled);
+}
+
+// 检查今天是否已写
+async function checkAlready(){
+  const today = new Date().toISOString().split('T')[0];
+  const text = await callAPI('read_my_diary', {author: currentAuthor, date: today});
+  const area = document.getElementById('alreadyArea');
+  const paper = document.getElementById('paperArea');
+  const submit = document.getElementById('submitWrap');
+
+  if (!text.includes('还没有写')) {
+    const content = text.replace(/^.+?：\n\n/, '');
+    area.innerHTML = `<div class="wd-already">
+      <div class="wd-already-icon">✦</div>
+      <div class="wd-already-text">今天已经写过了<br><br>「${escapeHtml(content.slice(0, 60))}${content.length > 60 ? '...' : ''}」</div>
+    </div>`;
+    paper.style.display = 'none';
+    submit.style.display = 'none';
+  } else {
+    area.innerHTML = '';
+    paper.style.display = 'block';
+    submit.style.display = 'block';
+  }
+
+  loadStreak();
+}
+
+// 打卡天数
+async function loadStreak(){
+  const text = await callAPI('get_streak', {author: currentAuthor});
+  const el = document.getElementById('streakArea');
+  if (text.includes('连续')) {
+    const match = text.match(/连续写日记(\d+)天/);
+    if (match) {
+      el.innerHTML = `<div class="wd-streak-text">🔥 已连续写日记 ${match[1]} 天</div>`;
+    }
+  } else {
+    el.innerHTML = `<div class="wd-streak-text">${text}</div>`;
+  }
+}
+
+// 提交
+async function submitDiary(){
+  const content = document.getElementById('diaryText').value.trim();
+  if (!content) { showToast('写点什么再落笔'); return; }
+
+  const args = { author: currentAuthor, content: content };
+
+  if (lockEnabled) {
+    const q = document.getElementById('lockQuestion').value.trim();
+    const a = document.getElementById('lockAnswer').value.trim();
+    if (q && a) {
+      args.question = q;
+      args.answer = a;
+    }
+  }
+
+  await callAPI('write_diary', args);
+  showToast('日记已保存 ✦');
+
+  document.getElementById('diaryText').value = '';
+  document.getElementById('charCount').textContent = '0';
+  document.getElementById('lockQuestion').value = '';
+  document.getElementById('lockAnswer').value = '';
+  if (lockEnabled) toggleLock();
+
+  checkAlready();
+}
+
+function escapeHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// 初始化
+updateDate();
+checkAlready();
+</script>
+
+</body>
+</html>
