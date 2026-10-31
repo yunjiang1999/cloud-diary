@@ -34,16 +34,12 @@ html, body {
 .dot{width:6px;height:6px;border-radius:50%;background:var(--border);transition:all .3s}
 .dot.active{background:var(--text);width:18px;border-radius:3px}
 
-/* 第一页背景壁纸 */
-.page1-bg{
-  position:relative;
-}
+/* 第一页壁纸 */
+.page1-bg{position:relative}
 .page1-bg::before{
   content:"";position:fixed;top:0;left:0;right:0;bottom:0;
   background:url('/icons/3.jpg') center/cover no-repeat;
-  opacity:0.18;
-  z-index:-1;
-  pointer-events:none;
+  opacity:0.18;z-index:-1;pointer-events:none;
 }
 
 /* 时间 */
@@ -92,7 +88,7 @@ html, body {
 }
 .affection-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px;position:relative;z-index:1}
 .affection-title{font-size:11px;color:var(--text);font-weight:600;letter-spacing:1px}
-.affection-title span{font-weight:400;color:var(--text-light);font-size:10px;margin-left:6px;letter-spacing:0}
+.affection-title span{font-weight:400;color:var(--text-light);font-size:10px;margin-left:6px}
 .affection-pct{font-size:12px;color:var(--text);font-weight:700;letter-spacing:1px}
 .affection-bar{width:100%;height:4px;border-radius:2px;background:rgba(189,187,191,0.2);margin-bottom:14px;position:relative;z-index:1;overflow:hidden}
 .affection-bar-inner{height:100%;border-radius:2px;background:linear-gradient(90deg,rgba(200,180,190,0.6),rgba(180,160,175,0.8));transition:width 1s ease}
@@ -131,33 +127,85 @@ html, body {
 .home-icons .app-icon-img:active{transform:scale(.93)}
 .home-icons .app-icon-label{font-size:8px;color:var(--text-light);margin-top:5px;letter-spacing:1px;text-align:center}
 
-/* 第二页 */
+/* ====== 第二页 ====== */
 .page2-header{text-align:center;padding:16px 0 6px}
 .page2-title{font-size:10px;color:var(--text-light);letter-spacing:4px}
 .page2-sub{font-size:18px;color:rgba(95,95,95,0.5);font-weight:700;letter-spacing:6px;margin-top:4px}
 
-.mood-question-row{display:flex;gap:12px;margin:14px 0}
-.mood-card-s{
-  flex:0 0 68px;
-  background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border:1px solid var(--glass-border);border-radius:16px;
-  padding:14px 0;text-align:center;
-  box-shadow:0 2px 12px var(--shadow),inset 0 1px 0 rgba(255,255,255,0.35);
+/* 票根信封卡片 */
+.envelope-card{
+  background:var(--glass2);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--glass-border);border-radius:20px;
+  margin:14px 0;position:relative;overflow:hidden;
+  box-shadow:0 3px 20px var(--shadow),inset 0 1px 0 rgba(255,255,255,0.5);
 }
-.mood-emoji{font-size:22px;cursor:pointer;transition:transform .15s}
-.mood-emoji:active{transform:scale(0.9)}
-.mood-label{font-size:8px;color:var(--text-light);margin-top:4px;letter-spacing:1px}
-.question-card-s{
-  flex:1;
-  background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border:1px solid var(--glass-border);border-radius:16px;
-  padding:12px 14px;
-  box-shadow:0 2px 12px var(--shadow),inset 0 1px 0 rgba(255,255,255,0.35);
-  display:flex;flex-direction:column;justify-content:center;
+.envelope-flap{
+  background:linear-gradient(135deg,rgba(232,220,226,0.6),rgba(239,228,233,0.8));
+  padding:14px 18px 10px;
+  border-bottom:1px dashed rgba(189,187,191,0.3);
+  position:relative;
 }
-.question-label{font-size:8px;color:var(--text-light);letter-spacing:2px;margin-bottom:4px;text-transform:uppercase}
-.question-text{font-size:11px;color:var(--text);line-height:1.6;font-style:italic}
+.envelope-flap::after{
+  content:"✦ · ✦ · ✦ · ✦ · ✦ · ✦ · ✦ · ✦";
+  position:absolute;bottom:-1px;left:0;right:0;
+  text-align:center;font-size:6px;
+  color:rgba(189,187,191,0.3);letter-spacing:2px;
+  line-height:1;
+}
+.envelope-tag{
+  display:inline-block;
+  background:rgba(95,95,95,0.08);
+  border-radius:4px;padding:3px 10px;
+  font-size:9px;color:var(--text-light);
+  letter-spacing:2px;text-transform:uppercase;
+}
+.envelope-date{
+  float:right;font-size:9px;color:var(--text-light);
+  letter-spacing:1px;margin-top:2px;
+}
+.envelope-body{
+  padding:18px 20px 20px;
+}
+.envelope-lines{
+  list-style:none;
+}
+.envelope-lines li{
+  font-size:12px;color:var(--text);
+  line-height:2.2;font-style:italic;
+  letter-spacing:.5px;
+  border-bottom:1px solid rgba(189,187,191,0.12);
+  padding:0 2px;
+}
+.envelope-lines li:last-child{border-bottom:none}
+.envelope-empty{
+  font-size:11px;color:var(--text-light);
+  font-style:italic;text-align:center;
+  padding:10px 0;letter-spacing:1px;
+}
+.envelope-stamp{
+  position:absolute;top:10px;right:14px;
+  width:36px;height:36px;border-radius:4px;
+  border:1.5px dashed rgba(189,187,191,0.25);
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;color:rgba(189,187,191,0.3);
+  transform:rotate(6deg);
+}
 
+/* 心情卡 - 独立小卡 */
+.mood-float{
+  display:flex;align-items:center;gap:12px;
+  background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--glass-border);border-radius:16px;
+  padding:12px 16px;margin:14px 0;
+  box-shadow:0 2px 12px var(--shadow),inset 0 1px 0 rgba(255,255,255,0.35);
+}
+.mood-float .mood-emoji{font-size:22px;cursor:pointer;transition:transform .15s}
+.mood-float .mood-emoji:active{transform:scale(0.9)}
+.mood-float-text{flex:1}
+.mood-float-label{font-size:8px;color:var(--text-light);letter-spacing:2px;text-transform:uppercase}
+.mood-float-quote{font-size:11px;color:var(--text);font-style:italic;margin-top:2px;letter-spacing:.5px}
+
+/* 功能图标 */
 .func-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:16px 0}
 .func-item{display:flex;flex-direction:column;align-items:center;text-decoration:none;cursor:pointer}
 .func-item:nth-child(2){margin-top:10px}
@@ -183,7 +231,7 @@ html, body {
 }
 .page2-deco img{width:100%;height:100%;object-fit:cover}
 
-/* 第三页：深渊 */
+/* ====== 第三页：深渊 ====== */
 .page3-bg{
   min-height:100%;
   background:linear-gradient(180deg,var(--bg) 0%,#1a1a1a 30%,#0d0d0d 100%);
@@ -200,6 +248,7 @@ html, body {
   font-size:8px;color:rgba(255,255,255,0.08);
   animation:twinkle 4s ease-in-out infinite;pointer-events:none;
 }
+@keyframes twinkle{0%,100%{opacity:0.2;transform:scale(0.8)}50%{opacity:0.6;transform:scale(1.2)}}
 .abyss-title{text-align:center;margin-bottom:6px;font-size:11px;letter-spacing:6px;color:rgba(255,255,255,0.2);text-transform:uppercase}
 .abyss-name{text-align:center;font-size:22px;font-weight:700;color:rgba(255,255,255,0.65);letter-spacing:8px;margin-bottom:4px}
 .abyss-sub{text-align:center;font-size:10px;color:rgba(255,255,255,0.15);letter-spacing:3px;margin-bottom:30px;font-style:italic}
@@ -236,10 +285,7 @@ html, body {
 
 <!-- 开屏 -->
 <div class="splash" id="splash">
-  <div class="petal"></div>
-  <div class="petal"></div>
-  <div class="petal"></div>
-  <div class="petal"></div>
+  <div class="petal"></div><div class="petal"></div><div class="petal"></div><div class="petal"></div>
   <div class="splash-line"></div>
   <div class="splash-title" id="splashTitle"></div>
   <div class="splash-quote" id="splashQuote"></div>
@@ -249,10 +295,7 @@ html, body {
 <div class="lock-screen hide" id="lockScreen">
   <div class="lock-title">输入密码回家</div>
   <div class="lock-dots" id="lockDots">
-    <div class="lock-dot"></div>
-    <div class="lock-dot"></div>
-    <div class="lock-dot"></div>
-    <div class="lock-dot"></div>
+    <div class="lock-dot"></div><div class="lock-dot"></div><div class="lock-dot"></div><div class="lock-dot"></div>
   </div>
   <div class="lock-keypad">
     <button class="lock-key" onclick="pressKey('1')">1</button>
@@ -350,17 +393,35 @@ html, body {
             <div class="page2-title">WITH YOU</div>
             <div class="page2-sub">我们的小窝</div>
           </div>
+
           <div class="lace-divider">· · · · · · · · ·</div>
-          <div class="mood-question-row">
-            <div class="mood-card-s">
-              <div class="mood-emoji" id="todayMood">☁️</div>
-              <div class="mood-label">mood</div>
+
+          <!-- 票根信封：摘抄展示 -->
+          <div class="envelope-card">
+            <div class="envelope-flap">
+              <span class="envelope-tag">✦ collected words ✦</span>
+              <span class="envelope-date" id="envelopeDate"></span>
+              <div class="envelope-stamp">♡</div>
             </div>
-            <div class="question-card-s">
-              <div class="question-label">daily question</div>
-              <div class="question-text" id="dailyQuestion">loading...</div>
+            <div class="envelope-body">
+              <ul class="envelope-lines" id="envelopeLines">
+                <li>还没有收藏过句子</li>
+                <li>在日记里长按喜欢的话</li>
+                <li>它就会出现在这里</li>
+              </ul>
             </div>
           </div>
+
+          <!-- 心情浮条 -->
+          <div class="mood-float">
+            <div class="mood-emoji" id="todayMood">☁️</div>
+            <div class="mood-float-text">
+              <div class="mood-float-label">today's mood</div>
+              <div class="mood-float-quote" id="moodQuote">点击左边切换心情</div>
+            </div>
+          </div>
+
+          <!-- 功能图标 -->
           <div class="func-grid">
             <a class="func-item" href="/diary.html">
               <div class="func-icon">✎</div>
@@ -407,9 +468,11 @@ html, body {
               <div class="func-label">coupon</div>
             </a>
           </div>
+
           <div class="page2-deco">
             <img src="/icons/deco.jpg" onerror="this.style.display='none'" alt="">
           </div>
+
           <div class="footer">WITH YOU</div>
         </div>
       </div>
@@ -490,6 +553,16 @@ const QUOTES = [
   "你笑起来的样子，是我见过最好的天气。",
   "如果可以，我想把所有温柔都给你。"
 ];
+const MOOD_TEXTS = {
+  "☀️": "晴天，心情也是",
+  "☁️": "有点灰，但还好",
+  "🌧️": "下雨了，想窝着",
+  "⭐": "今天闪闪的",
+  "🌙": "安静的夜晚",
+  "🌸": "被温柔包围",
+  "❄️": "冷冷的，想抱抱",
+  "🔥": "烧起来了"
+};
 
 // 开屏
 const titleEl = document.getElementById('splashTitle');
@@ -501,6 +574,11 @@ TITLE_TEXT.split('').forEach((ch, i) => {
 });
 document.getElementById('splashQuote').textContent =
   QUOTES[Math.floor(Math.random() * QUOTES.length)];
+
+// 信封日期
+const now = new Date();
+document.getElementById('envelopeDate').textContent =
+  (now.getMonth()+1) + '.' + now.getDate();
 
 setTimeout(() => {
   document.getElementById('splash').classList.add('fade-out');
@@ -542,15 +620,13 @@ function updateDots() {
 
 // 时间
 function updateTime() {
-  const now = new Date();
-  const h = String(now.getHours()).padStart(2, '0');
-  const m = String(now.getMinutes()).padStart(2, '0');
+  const n = new Date();
+  const h = String(n.getHours()).padStart(2, '0');
+  const m = String(n.getMinutes()).padStart(2, '0');
   document.getElementById('timeDisplay').textContent = h + ':' + m;
   const days = ['日', '一', '二', '三', '四', '五', '六'];
-  const month = now.getMonth() + 1;
-  const date = now.getDate();
   document.getElementById('dateDisplay').textContent =
-    month + '月' + date + '日  星期' + days[now.getDay()];
+    (n.getMonth()+1) + '月' + n.getDate() + '日  星期' + days[n.getDay()];
 }
 updateTime();
 setInterval(updateTime, 10000);
@@ -599,18 +675,6 @@ async function showHome() {
     document.getElementById('heroDays').textContent = "♡";
     document.getElementById('heroDays').nextElementSibling.textContent = "欢迎回家";
   }
-  try {
-    const res2 = await fetch(API, {
-      method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ jsonrpc: "2.0", id: 2, method: "tools/call",
-        params: { name: "daily_question", arguments: {} } })
-    });
-    const data2 = await res2.json();
-    const qText = data2.result.content[0].text.replace("今日互动问题：\n\n", "");
-    document.getElementById('dailyQuestion').textContent = qText;
-  } catch(e) {
-    document.getElementById('dailyQuestion').textContent = "今天也要好好的";
-  }
   document.getElementById('dailyQuote').textContent =
     QUOTES[Math.floor(Math.random() * QUOTES.length)];
 }
@@ -621,6 +685,7 @@ let moodIdx = 0;
 document.getElementById('todayMood').addEventListener('click', function() {
   moodIdx = (moodIdx + 1) % moods.length;
   this.textContent = moods[moodIdx];
+  document.getElementById('moodQuote').textContent = MOOD_TEXTS[moods[moodIdx]];
 });
 </script>
 
