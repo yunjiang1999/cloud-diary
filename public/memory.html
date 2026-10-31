@@ -9,7 +9,6 @@
 <style>
 body{min-height:100vh;padding-bottom:40px}
 
-/* 顶栏 */
 .mem-header{
   display:flex;align-items:center;gap:12px;
   padding:18px 15px 10px;max-width:420px;margin:0 auto;
@@ -24,30 +23,20 @@ body{min-height:100vh;padding-bottom:40px}
 .mem-title{font-size:16px;color:var(--text);font-weight:600;letter-spacing:3px}
 .mem-subtitle{font-size:9px;color:var(--text-light);letter-spacing:2px;margin-left:auto}
 
-/* Tab栏 */
 .mem-tabs{
-  display:flex;gap:0;max-width:420px;margin:0 auto;
-  padding:0 15px;
+  display:flex;gap:0;max-width:420px;margin:0 auto;padding:0 15px;
 }
 .mem-tab{
-  flex:1;text-align:center;
-  padding:10px 0 8px;
-  font-size:10px;color:var(--text-light);
-  letter-spacing:2px;cursor:pointer;
-  border-bottom:2px solid transparent;
-  transition:all .2s;
+  flex:1;text-align:center;padding:10px 0 8px;
+  font-size:10px;color:var(--text-light);letter-spacing:2px;cursor:pointer;
+  border-bottom:2px solid transparent;transition:all .2s;
 }
-.mem-tab.active{
-  color:var(--text);font-weight:600;
-  border-bottom-color:var(--text);
-}
+.mem-tab.active{color:var(--text);font-weight:600;border-bottom-color:var(--text)}
 
-/* 内容区 */
 .mem-content{max-width:420px;margin:0 auto;padding:14px 15px}
 .mem-panel{display:none}
 .mem-panel.active{display:block}
 
-/* 通用卡片 */
 .mem-card{
   background:var(--glass2);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   border:1px solid var(--glass-border);border-radius:18px;
@@ -72,21 +61,15 @@ body{min-height:100vh;padding-bottom:40px}
   background:linear-gradient(180deg,rgba(200,180,190,0.6),rgba(180,160,175,0.8));
 }
 .mem-item{
-  position:relative;z-index:1;
-  padding:8px 0;
+  position:relative;z-index:1;padding:8px 0;
   border-bottom:1px solid rgba(189,187,191,0.1);
-  font-size:12px;color:var(--text);line-height:1.7;
-  letter-spacing:.3px;
+  font-size:12px;color:var(--text);line-height:1.7;letter-spacing:.3px;
 }
 .mem-item:last-child{border-bottom:none}
-.mem-item-meta{
-  font-size:9px;color:var(--text-light);margin-top:2px;
-  letter-spacing:1px;
-}
+.mem-item-meta{font-size:9px;color:var(--text-light);margin-top:2px;letter-spacing:1px}
 .mem-empty{
   text-align:center;padding:30px 0;
-  font-size:12px;color:var(--text-light);
-  font-style:italic;letter-spacing:1px;
+  font-size:12px;color:var(--text-light);font-style:italic;letter-spacing:1px;
 }
 
 /* ====== 待办 tab ====== */
@@ -100,82 +83,156 @@ body{min-height:100vh;padding-bottom:40px}
   width:18px;height:18px;border-radius:50%;
   border:1.5px solid var(--border);
   display:flex;align-items:center;justify-content:center;
-  font-size:10px;color:transparent;
-  cursor:pointer;transition:all .2s;
+  font-size:10px;color:transparent;cursor:pointer;transition:all .2s;
   flex-shrink:0;margin-top:2px;
 }
-.todo-check.done{
-  background:var(--text);border-color:var(--text);
-  color:white;
-}
-.todo-text{
-  font-size:12px;color:var(--text);line-height:1.6;
-  letter-spacing:.3px;flex:1;
-}
-.todo-text.done{
-  text-decoration:line-through;
-  color:var(--text-light);opacity:0.6;
-}
-.todo-meta{
-  font-size:9px;color:var(--text-light);
-  margin-top:2px;letter-spacing:1px;
-}
+.todo-check.done{background:var(--text);border-color:var(--text);color:white}
+.todo-text{font-size:12px;color:var(--text);line-height:1.6;letter-spacing:.3px;flex:1}
+.todo-text.done{text-decoration:line-through;color:var(--text-light);opacity:0.6}
+.todo-meta{font-size:9px;color:var(--text-light);margin-top:2px;letter-spacing:1px}
 
 /* ====== 时间线 tab ====== */
-.timeline-wrap{
-  position:relative;
-  padding-left:20px;
+.tl-input-card{
+  background:var(--glass);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--glass-border);border-radius:16px;
+  padding:16px;margin-bottom:20px;
+  box-shadow:0 2px 12px var(--shadow),inset 0 1px 0 rgba(255,255,255,0.4);
 }
-.timeline-wrap::before{
+.tl-input-row{display:flex;gap:8px;margin-bottom:8px}
+.tl-input-row input{
+  flex:1;border:1px solid var(--glass-border);border-radius:10px;
+  padding:8px 10px;font-size:11px;font-family:inherit;
+  background:rgba(255,255,255,.3);color:var(--text);outline:none;
+}
+.tl-input-row input::placeholder{color:var(--text-light);font-style:italic}
+.tl-textarea{
+  width:100%;border:1px solid var(--glass-border);border-radius:10px;
+  padding:8px 10px;font-size:11px;font-family:inherit;min-height:50px;
+  background:rgba(255,255,255,.3);color:var(--text);outline:none;
+  resize:vertical;box-sizing:border-box;
+}
+.tl-textarea::placeholder{color:var(--text-light);font-style:italic}
+.tl-submit{
+  float:right;margin-top:8px;
+  padding:6px 18px;border-radius:10px;border:none;
+  background:var(--text);color:white;font-size:10px;
+  font-family:inherit;cursor:pointer;letter-spacing:2px;
+  transition:all .15s;
+}
+.tl-submit:active{transform:scale(.97)}
+
+/* 时间线列表 - 交错 */
+.tl-list{position:relative;padding:10px 0;min-height:40px}
+.tl-list::before{
   content:"";position:absolute;
-  left:6px;top:0;bottom:0;
-  width:1px;
-  background:linear-gradient(180deg,rgba(189,187,191,0.3),rgba(189,187,191,0.05));
+  left:50%;top:0;bottom:0;width:1px;
+  background:linear-gradient(180deg,rgba(189,187,191,0.35),rgba(189,187,191,0.05));
+  transform:translateX(-50%);
 }
-.tl-item{
+.tl-entry{
   position:relative;
-  padding:0 0 20px 16px;
+  width:44%;margin-bottom:24px;
+  clear:both;
 }
-.tl-dot{
-  position:absolute;left:-20px;top:4px;
-  width:11px;height:11px;border-radius:50%;
+.tl-entry.left{float:left;text-align:right;padding-right:18px}
+.tl-entry.right{float:right;text-align:left;padding-left:18px}
+.tl-entry .tl-dot{
+  position:absolute;top:6px;
+  width:10px;height:10px;border-radius:50%;
   border:2px solid rgba(200,180,190,0.6);
-  background:var(--bg);
-  z-index:1;
+  background:var(--bg);z-index:2;
 }
-.tl-date{
-  font-size:10px;color:var(--text-light);
-  letter-spacing:2px;margin-bottom:4px;
+.tl-entry.left .tl-dot{right:-5px}
+.tl-entry.right .tl-dot{left:-5px}
+.tl-entry .tl-e-date{
+  font-size:10px;color:var(--text-light);letter-spacing:2px;
+  margin-bottom:4px;font-style:italic;
 }
-.tl-title{
-  font-size:13px;color:var(--text);font-weight:600;
-  letter-spacing:1px;
+.tl-entry .tl-e-card{
+  background:var(--glass2);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid var(--glass-border);border-radius:14px;
+  padding:12px 14px;
+  box-shadow:0 2px 12px var(--shadow),inset 0 1px 0 rgba(255,255,255,0.4);
 }
-.tl-detail{
-  font-size:11px;color:var(--text-light);
-  margin-top:3px;line-height:1.6;font-style:italic;
+.tl-entry .tl-e-title{
+  font-size:12px;color:var(--text);font-weight:600;letter-spacing:1px;line-height:1.5;
 }
+.tl-entry .tl-e-detail{
+  font-size:10px;color:var(--text-light);margin-top:4px;
+  line-height:1.6;font-style:italic;
+}
+.tl-clear{clear:both}
 
 /* ====== 纪念日 tab ====== */
+/* 日历 */
+.cal-card{
+  background:var(--glass2);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border:1px solid var(--glass-border);border-radius:20px;
+  padding:18px;margin-bottom:14px;
+  box-shadow:0 2px 16px var(--shadow),inset 0 1px 0 rgba(255,255,255,0.5);
+  position:relative;overflow:hidden;
+}
+.cal-card::before{
+  content:"";position:absolute;top:-30%;left:-30%;width:160%;height:160%;
+  background:radial-gradient(ellipse at 40% 20%,rgba(255,255,255,0.15),transparent 55%);
+  pointer-events:none;
+}
+.cal-header{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:14px;position:relative;z-index:1;
+}
+.cal-nav{
+  width:28px;height:28px;border-radius:50%;
+  border:1px solid var(--glass-border);background:rgba(255,255,255,0.3);
+  display:flex;align-items:center;justify-content:center;
+  font-size:12px;color:var(--text);cursor:pointer;
+  transition:all .15s;
+}
+.cal-nav:active{transform:scale(.93)}
+.cal-month-wrap{text-align:center}
+.cal-year{font-size:9px;color:var(--text-light);letter-spacing:3px}
+.cal-month{font-size:18px;color:var(--text);font-weight:700;letter-spacing:2px;margin-top:2px}
+.cal-weekdays{
+  display:grid;grid-template-columns:repeat(7,1fr);
+  margin-bottom:6px;position:relative;z-index:1;
+}
+.cal-wd{
+  text-align:center;font-size:9px;color:var(--text-light);
+  letter-spacing:1px;padding:4px 0;
+}
+.cal-days{
+  display:grid;grid-template-columns:repeat(7,1fr);
+  gap:4px;position:relative;z-index:1;
+}
+.cal-day{
+  text-align:center;padding:6px 0;
+  font-size:11px;color:var(--text);
+  border-radius:10px;transition:all .15s;
+  position:relative;
+}
+.cal-day.other{color:var(--border);opacity:0.5}
+.cal-day.today{
+  background:rgba(200,180,190,0.25);font-weight:700;
+}
+.cal-day.has-event{font-weight:600}
+.cal-day.has-event::after{
+  content:"";position:absolute;bottom:2px;left:50%;
+  transform:translateX(-50%);
+  width:4px;height:4px;border-radius:50%;
+  background:rgba(200,180,190,0.7);
+}
+
 .anni-item{
-  display:flex;justify-content:space-between;
-  align-items:center;
+  display:flex;justify-content:space-between;align-items:center;
   padding:12px 0;position:relative;z-index:1;
   border-bottom:1px solid rgba(189,187,191,0.1);
 }
 .anni-item:last-child{border-bottom:none}
 .anni-name{font-size:12px;color:var(--text);letter-spacing:1px}
 .anni-date{font-size:10px;color:var(--text-light);margin-top:2px}
-.anni-days{
-  font-size:18px;font-weight:700;color:var(--text);
-  letter-spacing:1px;
-}
-.anni-days-label{
-  font-size:8px;color:var(--text-light);
-  text-align:right;letter-spacing:1px;
-}
+.anni-days{font-size:18px;font-weight:700;color:var(--text);letter-spacing:1px}
+.anni-days-label{font-size:8px;color:var(--text-light);text-align:right;letter-spacing:1px}
 
-/* 添加按钮 */
 .mem-add-btn{
   display:block;width:100%;padding:12px;
   border-radius:14px;border:1px dashed rgba(189,187,191,0.3);
@@ -191,46 +248,35 @@ body{min-height:100vh;padding-bottom:40px}
 .mem-modal-overlay{
   position:fixed;top:0;left:0;right:0;bottom:0;
   background:rgba(0,0,0,0.3);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);
-  z-index:100;display:none;
-  align-items:center;justify-content:center;
+  z-index:100;display:none;align-items:center;justify-content:center;
 }
 .mem-modal-overlay.show{display:flex}
 .mem-modal{
-  width:88%;max-width:380px;
-  background:var(--bg);border-radius:20px;
-  padding:24px 20px;
-  box-shadow:0 8px 40px rgba(0,0,0,0.15);
+  width:88%;max-width:380px;background:var(--bg);border-radius:20px;
+  padding:24px 20px;box-shadow:0 8px 40px rgba(0,0,0,0.15);
 }
 .mem-modal h3{
   font-size:14px;color:var(--text);font-weight:600;
   letter-spacing:2px;margin-bottom:16px;text-align:center;
 }
 .mem-modal label{
-  font-size:10px;color:var(--text-light);
-  letter-spacing:1px;display:block;margin-bottom:4px;margin-top:10px;
+  font-size:10px;color:var(--text-light);letter-spacing:1px;
+  display:block;margin-bottom:4px;margin-top:10px;
 }
 .mem-modal input,.mem-modal textarea,.mem-modal select{
-  width:100%;border:1px solid var(--glass-border);
-  border-radius:10px;padding:10px 12px;font-size:12px;
-  font-family:inherit;background:rgba(255,255,255,.3);
-  color:var(--text);outline:none;box-sizing:border-box;
+  width:100%;border:1px solid var(--glass-border);border-radius:10px;
+  padding:10px 12px;font-size:12px;font-family:inherit;
+  background:rgba(255,255,255,.3);color:var(--text);outline:none;box-sizing:border-box;
 }
 .mem-modal textarea{min-height:80px;resize:vertical}
 .mem-modal select{appearance:none;-webkit-appearance:none}
-.mem-modal-btns{
-  display:flex;gap:10px;margin-top:16px;
-}
+.mem-modal-btns{display:flex;gap:10px;margin-top:16px}
 .mem-modal-btns button{
-  flex:1;padding:10px;border-radius:12px;
-  font-size:12px;font-family:inherit;cursor:pointer;
-  letter-spacing:1px;transition:all .15s;
+  flex:1;padding:10px;border-radius:12px;font-size:12px;
+  font-family:inherit;cursor:pointer;letter-spacing:1px;transition:all .15s;
 }
-.mem-modal-btns .cancel{
-  border:1px solid var(--glass-border);background:transparent;color:var(--text-light);
-}
-.mem-modal-btns .confirm{
-  border:none;background:var(--text);color:white;
-}
+.mem-modal-btns .cancel{border:1px solid var(--glass-border);background:transparent;color:var(--text-light)}
+.mem-modal-btns .confirm{border:none;background:var(--text);color:white}
 .mem-modal-btns button:active{transform:scale(.97)}
 </style>
 </head>
@@ -259,29 +305,48 @@ body{min-height:100vh;padding-bottom:40px}
 
   <!-- 待办 -->
   <div class="mem-panel" id="panel-todos">
-    <div class="mem-card">
-      <div id="todosList"></div>
-    </div>
+    <div class="mem-card"><div id="todosList"></div></div>
     <button class="mem-add-btn" onclick="openModal('todo')">+ 添加待办</button>
   </div>
 
   <!-- 时间线 -->
   <div class="mem-panel" id="panel-timeline">
-    <div class="timeline-wrap" id="timelineList"></div>
-    <button class="mem-add-btn" onclick="openModal('timeline')">+ 添加事件</button>
+    <div class="tl-input-card">
+      <div class="tl-input-row">
+        <input type="date" id="tlDateInline" placeholder="日期">
+        <input type="text" id="tlTitleInline" placeholder="发生了什么...">
+      </div>
+      <textarea class="tl-textarea" id="tlDetailInline" placeholder="记录新的里程碑..."></textarea>
+      <button class="tl-submit" onclick="submitTimelineInline()">RECORD</button>
+      <div style="clear:both"></div>
+    </div>
+    <div class="tl-list" id="timelineList"></div>
+    <div class="tl-clear"></div>
   </div>
 
   <!-- 纪念日 -->
   <div class="mem-panel" id="panel-anniversary">
-    <div class="mem-card">
-      <div id="anniversaryList"></div>
+    <div class="cal-card">
+      <div class="cal-header">
+        <div class="cal-nav" onclick="calPrev()">‹</div>
+        <div class="cal-month-wrap">
+          <div class="cal-year" id="calYear"></div>
+          <div class="cal-month" id="calMonth"></div>
+        </div>
+        <div class="cal-nav" onclick="calNext()">›</div>
+      </div>
+      <div class="cal-weekdays">
+        <div class="cal-wd">Mon</div><div class="cal-wd">Tue</div><div class="cal-wd">Wed</div>
+        <div class="cal-wd">Thu</div><div class="cal-wd">Fri</div><div class="cal-wd">Sat</div><div class="cal-wd">Sun</div>
+      </div>
+      <div class="cal-days" id="calDays"></div>
     </div>
+    <div class="mem-card"><div id="anniversaryList"></div></div>
     <button class="mem-add-btn" onclick="openModal('anniversary')">+ 添加纪念日</button>
   </div>
 
 </div>
 
-<!-- 弹窗 -->
 <div class="mem-modal-overlay" id="modalOverlay">
   <div class="mem-modal" id="modalContent"></div>
 </div>
@@ -290,6 +355,9 @@ body{min-height:100vh;padding-bottom:40px}
 
 <script>
 const API = window.location.origin + "/api";
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+let calDate = new Date();
+let anniDates = [];
 
 function callAPI(toolName, args) {
   return fetch(API, {
@@ -308,7 +376,7 @@ function showToast(msg) {
   setTimeout(() => t.classList.remove('show'), 1800);
 }
 
-// ====== Tab 切换 ======
+// Tab
 document.querySelectorAll('.mem-tab').forEach(tab => {
   tab.addEventListener('click', () => {
     document.querySelectorAll('.mem-tab').forEach(t => t.classList.remove('active'));
@@ -319,7 +387,6 @@ document.querySelectorAll('.mem-tab').forEach(tab => {
   });
 });
 
-// ====== 加载数据 ======
 async function loadTab(tab) {
   switch(tab) {
     case 'memories': return loadMemories();
@@ -329,6 +396,7 @@ async function loadTab(tab) {
   }
 }
 
+// ====== 记忆 ======
 async function loadMemories() {
   const text = await callAPI('get_memories', {});
   const el = document.getElementById('memoriesList');
@@ -336,26 +404,26 @@ async function loadMemories() {
     el.innerHTML = '<div class="mem-empty">还没有记忆，来添加第一条吧 ✦</div>';
     return;
   }
-  let html = '';
+  let html = '', inCard = false;
   const lines = text.split('\n');
   for (const line of lines) {
     if (line.startsWith('【')) {
+      if (inCard) html += '</div>';
       html += `<div class="mem-cat-title">${line.replace('【','').replace('】','')}</div><div class="mem-card">`;
+      inCard = true;
     } else if (line.startsWith('·')) {
-      const idMatch = line.match(/\[id:(\w+)\]/);
       const content = line.replace(/\[id:\w+\]/, '').replace('· ', '');
       const parts = content.split('（');
       const mainText = parts[0].trim();
-      const meta = parts.length > 1 ? parts.slice(1).join('（').replace('）', '') : '';
+      const meta = parts.length > 1 ? parts.slice(1).join('（').replace(/）$/, '') : '';
       html += `<div class="mem-item">${mainText}<div class="mem-item-meta">${meta}</div></div>`;
-    } else if (line === '') {
-      html += '</div>';
     }
   }
-  html += '</div>';
+  if (inCard) html += '</div>';
   el.innerHTML = html;
 }
 
+// ====== 待办 ======
 async function loadTodos() {
   const text = await callAPI('get_todos', { show_done: true });
   const el = document.getElementById('todosList');
@@ -374,64 +442,8 @@ async function loadTodos() {
     const content = parts[0].trim();
     const meta = parts.length > 1 ? parts[1].replace('）', '') : '';
     html += `<div class="todo-item">
-      <div class="todo-check ${isDone ? 'done' : ''}" onclick="completeTodo('${id}')">${isDone ? '✓' : ''}</div>
-      <div>
-        <div class="todo-text ${isDone ? 'done' : ''}">${content}</div>
-        <div class="todo-meta">${meta}</div>
-      </div>
-    </div>`;
-  }
-  el.innerHTML = html;
-}
-
-async function loadTimeline() {
-  const text = await callAPI('get_timeline', {});
-  const el = document.getElementById('timelineList');
-  if (text.includes('还是空的')) {
-    el.innerHTML = '<div class="mem-empty">时间线还是空的，记录我们的故事吧 ✦</div>';
-    return;
-  }
-  const events = text.split('\n\n');
-  let html = '';
-  for (const ev of events) {
-    const lines = ev.split('\n');
-    const firstLine = lines[0];
-    const dashIdx = firstLine.indexOf(' — ');
-    if (dashIdx === -1) continue;
-    const date = firstLine.substring(0, dashIdx).trim();
-    const title = firstLine.substring(dashIdx + 3).trim();
-    const detail = lines.length > 1 ? lines[1].trim().replace('　　', '') : '';
-    html += `<div class="tl-item">
-      <div class="tl-dot"></div>
-      <div class="tl-date">${date}</div>
-      <div class="tl-title">${title}</div>
-      ${detail ? `<div class="tl-detail">${detail}</div>` : ''}
-    </div>`;
-  }
-  el.innerHTML = html;
-}
-
-async function loadAnniversary() {
-  const text = await callAPI('get_anniversary', {});
-  const el = document.getElementById('anniversaryList');
-  if (!text.trim()) {
-    el.innerHTML = '<div class="mem-empty">还没有纪念日 ✦</div>';
-    return;
-  }
-  const lines = text.split('\n').filter(l => l.trim());
-  let html = '';
-  for (const line of lines) {
-    const match = line.match(/(.+?)：(\d{4}-\d{2}-\d{2})（第(\d+)天）/);
-    if (!match) continue;
-    html += `<div class="anni-item">
-      <div>
-        <div class="anni-name">${match[1]}</div>
-        <div class="anni-date">${match[2]}</div>
-      </div>
-      <div style="text-align:right">
-        <div class="anni-days">${match[3]}</div>
-        <div class="anni-days-label">days</div>
-      </div>
+      <div class="todo-check ${isDone?'done':''}" onclick="completeTodo('${id}')">${isDone?'✓':''}</div>
+      <div><div class="todo-text ${isDone?'done':''}">${content}</div><div class="todo-meta">${meta}</div></div>
     </div>`;
   }
   el.innerHTML = html;
@@ -443,74 +455,144 @@ async function completeTodo(id) {
   loadTodos();
 }
 
-// ====== 弹窗 ======
+// ====== 时间线 ======
+async function loadTimeline() {
+  const text = await callAPI('get_timeline', {});
+  const el = document.getElementById('timelineList');
+  if (text.includes('还是空的')) {
+    el.innerHTML = '<div class="mem-empty">时间线还是空的，记录我们的故事吧 ✦</div>';
+    return;
+  }
+  const events = text.split('\n\n');
+  let html = '';
+  events.forEach((ev, i) => {
+    const lines = ev.split('\n');
+    const firstLine = lines[0];
+    const dashIdx = firstLine.indexOf(' — ');
+    if (dashIdx === -1) return;
+    const date = firstLine.substring(0, dashIdx).trim();
+    const title = firstLine.substring(dashIdx + 3).trim();
+    const detail = lines.length > 1 ? lines[1].trim().replace(/　　/g, '') : '';
+    const side = i % 2 === 0 ? 'left' : 'right';
+    html += `<div class="tl-entry ${side}">
+      <div class="tl-dot"></div>
+      <div class="tl-e-date">${date}</div>
+      <div class="tl-e-card">
+        <div class="tl-e-title">${title}</div>
+        ${detail ? `<div class="tl-e-detail">${detail}</div>` : ''}
+      </div>
+    </div>`;
+  });
+  html += '<div class="tl-clear"></div>';
+  el.innerHTML = html;
+}
+
+async function submitTimelineInline() {
+  const date = document.getElementById('tlDateInline').value;
+  const title = document.getElementById('tlTitleInline').value.trim();
+  const detail = document.getElementById('tlDetailInline').value.trim();
+  if (!date || !title) return;
+  await callAPI('add_timeline', { date, title, detail: detail || undefined, added_by: '云云' });
+  document.getElementById('tlDateInline').value = '';
+  document.getElementById('tlTitleInline').value = '';
+  document.getElementById('tlDetailInline').value = '';
+  showToast('事件已添加 ✦');
+  loadTimeline();
+}
+
+// ====== 纪念日 + 日历 ======
+async function loadAnniversary() {
+  const text = await callAPI('get_anniversary', {});
+  const el = document.getElementById('anniversaryList');
+  anniDates = [];
+  if (!text.trim()) {
+    el.innerHTML = '<div class="mem-empty">还没有纪念日 ✦</div>';
+    renderCalendar(); return;
+  }
+  const lines = text.split('\n').filter(l => l.trim());
+  let html = '';
+  for (const line of lines) {
+    const match = line.match(/(.+?)：(\d{4}-\d{2}-\d{2})（第(\d+)天）/);
+    if (!match) continue;
+    anniDates.push(match[2]);
+    html += `<div class="anni-item">
+      <div><div class="anni-name">${match[1]}</div><div class="anni-date">${match[2]}</div></div>
+      <div style="text-align:right"><div class="anni-days">${match[3]}</div><div class="anni-days-label">days</div></div>
+    </div>`;
+  }
+  el.innerHTML = html;
+  renderCalendar();
+}
+
+function renderCalendar() {
+  const y = calDate.getFullYear();
+  const m = calDate.getMonth();
+  document.getElementById('calYear').textContent = y;
+  document.getElementById('calMonth').textContent = MONTHS[m] + ' / ' + String(m+1).padStart(2,'0');
+
+  const firstDay = new Date(y, m, 1).getDay();
+  const startDay = firstDay === 0 ? 6 : firstDay - 1;
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const daysInPrev = new Date(y, m, 0).getDate();
+  const today = new Date();
+  const todayStr = today.toISOString().split('T')[0];
+
+  let html = '';
+  // prev month
+  for (let i = startDay - 1; i >= 0; i--) {
+    html += `<div class="cal-day other">${daysInPrev - i}</div>`;
+  }
+  // current month
+  for (let d = 1; d <= daysInMonth; d++) {
+    const dateStr = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday = dateStr === todayStr;
+    const hasEvent = anniDates.includes(dateStr);
+    let cls = 'cal-day';
+    if (isToday) cls += ' today';
+    if (hasEvent) cls += ' has-event';
+    html += `<div class="${cls}">${d}</div>`;
+  }
+  // next month
+  const totalCells = startDay + daysInMonth;
+  const remaining = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+  for (let i = 1; i <= remaining; i++) {
+    html += `<div class="cal-day other">${i}</div>`;
+  }
+  document.getElementById('calDays').innerHTML = html;
+}
+
+function calPrev() { calDate.setMonth(calDate.getMonth() - 1); renderCalendar(); }
+function calNext() { calDate.setMonth(calDate.getMonth() + 1); renderCalendar(); }
+
+// 弹窗
 function openModal(type) {
   const overlay = document.getElementById('modalOverlay');
   const content = document.getElementById('modalContent');
   let html = '';
-
   if (type === 'memory') {
     html = `<h3>添加记忆</h3>
       <label>分类</label>
-      <select id="mCategory">
-        <option>喜好</option><option>习惯</option><option>重要的话</option>
-        <option>关于对方</option><option>我们的故事</option><option>其他</option>
-      </select>
-      <label>内容</label>
-      <textarea id="mContent" placeholder="写下想记住的事..."></textarea>
-      <label>谁添加的</label>
-      <select id="mBy"><option>云云</option><option>哥哥</option></select>
-      <div class="mem-modal-btns">
-        <button class="cancel" onclick="closeModal()">取消</button>
-        <button class="confirm" onclick="submitMemory()">保存</button>
-      </div>`;
+      <select id="mCategory"><option>喜好</option><option>习惯</option><option>重要的话</option><option>关于对方</option><option>我们的故事</option><option>其他</option></select>
+      <label>内容</label><textarea id="mContent" placeholder="写下想记住的事..."></textarea>
+      <label>谁添加的</label><select id="mBy"><option>云云</option><option>哥哥</option></select>
+      <div class="mem-modal-btns"><button class="cancel" onclick="closeModal()">取消</button><button class="confirm" onclick="submitMemory()">保存</button></div>`;
   } else if (type === 'todo') {
     html = `<h3>添加待办</h3>
-      <label>内容</label>
-      <input id="tContent" placeholder="要做的事...">
-      <label>谁添加的</label>
-      <select id="tBy"><option>云云</option><option>哥哥</option></select>
-      <div class="mem-modal-btns">
-        <button class="cancel" onclick="closeModal()">取消</button>
-        <button class="confirm" onclick="submitTodo()">保存</button>
-      </div>`;
-  } else if (type === 'timeline') {
-    html = `<h3>添加事件</h3>
-      <label>日期</label>
-      <input type="date" id="tlDate">
-      <label>标题</label>
-      <input id="tlTitle" placeholder="发生了什么...">
-      <label>详细描述（可选）</label>
-      <textarea id="tlDetail" placeholder="更多细节..."></textarea>
-      <label>谁添加的</label>
-      <select id="tlBy"><option>云云</option><option>哥哥</option></select>
-      <div class="mem-modal-btns">
-        <button class="cancel" onclick="closeModal()">取消</button>
-        <button class="confirm" onclick="submitTimeline()">保存</button>
-      </div>`;
+      <label>内容</label><input id="tContent" placeholder="要做的事...">
+      <label>谁添加的</label><select id="tBy"><option>云云</option><option>哥哥</option></select>
+      <div class="mem-modal-btns"><button class="cancel" onclick="closeModal()">取消</button><button class="confirm" onclick="submitTodo()">保存</button></div>`;
   } else if (type === 'anniversary') {
     html = `<h3>添加纪念日</h3>
-      <label>名称</label>
-      <input id="aName" placeholder="纪念日名称...">
-      <label>日期</label>
-      <input type="date" id="aDate">
-      <div class="mem-modal-btns">
-        <button class="cancel" onclick="closeModal()">取消</button>
-        <button class="confirm" onclick="submitAnniversary()">保存</button>
-      </div>`;
+      <label>名称</label><input id="aName" placeholder="纪念日名称...">
+      <label>日期</label><input type="date" id="aDate">
+      <div class="mem-modal-btns"><button class="cancel" onclick="closeModal()">取消</button><button class="confirm" onclick="submitAnniversary()">保存</button></div>`;
   }
-
   content.innerHTML = html;
   overlay.classList.add('show');
 }
 
-function closeModal() {
-  document.getElementById('modalOverlay').classList.remove('show');
-}
-
-document.getElementById('modalOverlay').addEventListener('click', function(e) {
-  if (e.target === this) closeModal();
-});
+function closeModal() { document.getElementById('modalOverlay').classList.remove('show'); }
+document.getElementById('modalOverlay').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
 
 async function submitMemory() {
   const cat = document.getElementById('mCategory').value;
@@ -527,16 +609,6 @@ async function submitTodo() {
   if (!content) return;
   await callAPI('add_todo', { content, added_by: by });
   closeModal(); showToast('待办已添加 ✦'); loadTodos();
-}
-
-async function submitTimeline() {
-  const date = document.getElementById('tlDate').value;
-  const title = document.getElementById('tlTitle').value.trim();
-  const detail = document.getElementById('tlDetail').value.trim();
-  const by = document.getElementById('tlBy').value;
-  if (!date || !title) return;
-  await callAPI('add_timeline', { date, title, detail: detail || undefined, added_by: by });
-  closeModal(); showToast('事件已添加 ✦'); loadTimeline();
 }
 
 async function submitAnniversary() {
