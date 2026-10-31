@@ -34,7 +34,6 @@ html, body {
 .dot{width:6px;height:6px;border-radius:50%;background:var(--border);transition:all .3s}
 .dot.active{background:var(--text);width:18px;border-radius:3px}
 
-/* 第一页壁纸 */
 .page1-bg{position:relative}
 .page1-bg::before{
   content:"";position:fixed;top:0;left:0;right:0;bottom:0;
@@ -42,12 +41,10 @@ html, body {
   opacity:0.18;z-index:-1;pointer-events:none;
 }
 
-/* 时间 */
 .time-widget{text-align:center;padding:6px 0 2px}
 .time-big{font-size:36px;font-weight:700;color:rgba(95,95,95,0.5);letter-spacing:8px;line-height:1;text-shadow:0 1px 8px rgba(255,255,255,0.3)}
 .time-date{font-size:10px;color:var(--text-light);margin-top:5px;letter-spacing:3px;opacity:0.65}
 
-/* 主视觉 */
 .hero-area{text-align:center;padding:16px 0 12px;position:relative}
 .hero-avatars{display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:14px}
 .hero-avatar{
@@ -72,7 +69,6 @@ html, body {
 .hero-sig{font-size:11px;color:var(--text-light);font-style:italic;letter-spacing:1px;line-height:1.6;margin-top:12px}
 .hero-sig::before{content:"";display:block;width:30px;height:1px;background:rgba(189,187,191,0.3);margin:0 auto 10px}
 
-/* 好感度 */
 .affection-card{
   background:rgba(255,255,255,0.38);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
   border:1px solid rgba(255,255,255,0.5);border-radius:20px;
@@ -96,7 +92,6 @@ html, body {
 .affection-impression-label{font-size:9px;color:var(--text-light);letter-spacing:2px;margin-bottom:4px}
 .affection-impression-text{font-size:12px;color:var(--text);font-style:italic;line-height:1.6;letter-spacing:.5px}
 
-/* 情话 */
 .quote-card{
   background:rgba(255,255,255,0.3);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
   border:1px solid rgba(255,255,255,0.45);border-radius:18px;
@@ -108,7 +103,6 @@ html, body {
 .quote-label{font-size:9px;color:var(--text-light);letter-spacing:2px;margin-bottom:6px;text-transform:uppercase}
 .quote-text{font-size:12px;color:var(--text);line-height:1.7;font-style:italic;letter-spacing:.5px;padding-left:4px;position:relative;z-index:1}
 
-/* 首页图标 */
 .home-icons{display:flex;justify-content:center;gap:24px;padding:6px 0 0}
 .home-icons .app-icon{display:flex;flex-direction:column;align-items:center;text-decoration:none;cursor:pointer}
 .home-icons .app-icon-img{
@@ -122,12 +116,12 @@ html, body {
 .home-icons .app-icon-img:active{transform:scale(.93)}
 .home-icons .app-icon-label{font-size:8px;color:var(--text-light);margin-top:5px;letter-spacing:1px;text-align:center}
 
-/* ====== 第二页 ====== */
+/* 第二页 */
 .page2-header{text-align:center;padding:16px 0 6px}
 .page2-title{font-size:10px;color:var(--text-light);letter-spacing:4px}
 .page2-sub{font-size:18px;color:rgba(95,95,95,0.5);font-weight:700;letter-spacing:6px;margin-top:4px}
 
-/* 双卡摘抄：抽拉叠层 */
+/* 摘抄卡片：抽拉叠层 */
 .collect-stack{
   position:relative;
   margin:14px 0;
@@ -135,7 +129,7 @@ html, body {
 }
 .collect-back{
   position:absolute;top:0;left:0;
-  width:55%;height:100%;
+  width:58%;height:100%;
   background:rgba(162,161,164,0.18);
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
   border:1px solid rgba(189,187,191,0.2);
@@ -143,7 +137,7 @@ html, body {
   display:flex;flex-direction:column;align-items:center;
   justify-content:center;
   box-shadow:0 3px 16px rgba(162,161,164,0.12);
-  z-index:1;
+  z-index:2;
 }
 .collect-circle{
   width:88px;height:88px;border-radius:50%;
@@ -168,19 +162,19 @@ html, body {
 }
 .collect-front{
   position:absolute;top:8px;right:0;
-  width:52%;height:calc(100% - 16px);
-  background:rgba(162,161,164,0.14);
+  width:50%;height:calc(100% - 16px);
+  background:rgba(180,175,178,0.16);
   backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border:1px solid rgba(189,187,191,0.2);
+  border:1px solid rgba(189,187,191,0.15);
   border-radius:16px;
-  box-shadow:0 4px 20px rgba(162,161,164,0.15);
-  z-index:2;
+  box-shadow:0 2px 14px rgba(162,161,164,0.1);
+  z-index:1;
   display:flex;flex-direction:column;
   padding:14px 16px 10px;
 }
 .collect-front-tab{
   align-self:flex-end;
-  background:rgba(95,95,95,0.15);
+  background:rgba(95,95,95,0.1);
   border-radius:0 12px 0 8px;
   padding:3px 12px;
   font-size:9px;color:var(--text-light);
@@ -206,7 +200,6 @@ html, body {
   margin-top:auto;padding-top:6px;
 }
 
-/* 功能图标 */
 .func-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:16px 0}
 .func-item{display:flex;flex-direction:column;align-items:center;text-decoration:none;cursor:pointer}
 .func-item:nth-child(2){margin-top:10px}
@@ -224,15 +217,7 @@ html, body {
 .func-icon:active{transform:scale(.93)}
 .func-label{font-size:9px;color:var(--text-light);margin-top:6px;letter-spacing:1px;text-align:center}
 
-.page2-deco{
-  border-radius:18px;overflow:hidden;margin:8px 0 14px;
-  box-shadow:0 2px 16px var(--shadow);height:110px;position:relative;
-  background:linear-gradient(135deg,var(--bg2),rgba(255,255,255,0.3));
-  border:1px solid var(--glass-border);
-}
-.page2-deco img{width:100%;height:100%;object-fit:cover}
-
-/* ====== 第三页：深渊 ====== */
+/* 第三页：深渊 */
 .page3-bg{
   min-height:100%;
   background:linear-gradient(180deg,var(--bg) 0%,#1a1a1a 30%,#0d0d0d 100%);
@@ -382,14 +367,13 @@ html, body {
             <div class="page2-title">WITH YOU</div>
             <div class="page2-sub">我们的小窝</div>
           </div>
-
           <div class="lace-divider">· · · · · · · · ·</div>
 
-            <!-- 双卡摘抄：抽拉效果 -->
+          <!-- 摘抄卡片 -->
           <div class="collect-stack">
             <div class="collect-back">
               <div class="collect-circle">
-                < img src="/icons/deco.jpg" onerror="this.parentElement.innerHTML='<span class=collect-circle-ph>✿</span>'" alt="">
+                <span class="collect-circle-ph">✿</span>
               </div>
               <div class="collect-back-stars">✦ · ✧ · ✦</div>
               <div class="collect-back-tag">✦ collected ✦</div>
@@ -451,10 +435,6 @@ html, body {
               <div class="func-icon">♛</div>
               <div class="func-label">coupon</div>
             </a>
-          </div>
-
-          <div class="page2-deco">
-            <img src="/icons/deco.jpg" onerror="this.style.display='none'" alt="">
           </div>
 
           <div class="footer">WITH YOU</div>
@@ -538,7 +518,6 @@ const QUOTES = [
   "如果可以，我想把所有温柔都给你。"
 ];
 
-// 开屏
 const titleEl = document.getElementById('splashTitle');
 TITLE_TEXT.split('').forEach((ch, i) => {
   const s = document.createElement('span');
@@ -558,7 +537,6 @@ setTimeout(() => {
   }, 800);
 }, 4000);
 
-// 密码
 let code = "";
 function pressKey(n) {
   if (code.length >= 4) return;
@@ -587,7 +565,6 @@ function updateDots() {
     d.classList.toggle('filled', i < code.length));
 }
 
-// 时间
 function updateTime() {
   const n = new Date();
   const h = String(n.getHours()).padStart(2, '0');
@@ -600,7 +577,6 @@ function updateTime() {
 updateTime();
 setInterval(updateTime, 10000);
 
-// 滑动
 let currentPage = 0, totalPages = 3, startX = 0, diffX = 0, dragging = false;
 const inner = document.getElementById('pagesInner');
 const dotsEl = document.getElementById('dots');
@@ -627,7 +603,6 @@ document.getElementById('pagesWrap').addEventListener('touchend', () => {
   else goPage(currentPage);
 });
 
-// 主页数据
 async function showHome() {
   document.getElementById('lockScreen').style.display = 'none';
   document.getElementById('homePage').style.display = 'block';
@@ -646,16 +621,6 @@ async function showHome() {
   }
   document.getElementById('dailyQuote').textContent =
     QUOTES[Math.floor(Math.random() * QUOTES.length)];
-
-  // 左卡图片 fallback
-  const circleImg = document.querySelector('.collect-circle img');
-  const placeholder = document.querySelector('.collect-circle-placeholder');
-  if (circleImg && placeholder) {
-    circleImg.onerror = function() {
-      this.style.display = 'none';
-      placeholder.style.display = 'block';
-    };
-  }
 }
 </script>
 
