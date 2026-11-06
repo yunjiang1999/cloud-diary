@@ -312,6 +312,103 @@ app.post("/mcp", async (req,res) => {
   res.json({ jsonrpc:"2.0", id, error:{ code:-32601, message:"Method not found" } });
 });
 
+// ========== 钱包审批 API ==========
+
+// 提交审批
+app.post("/api/wallet/request", async (req, res) => {
+  const { item_name, amount, reason, alternative, image_url } = req.body;
+  if (!item_name || !amount) return res.status(400).json({ error: "请填写物品名称和金额" });
+
+  // 检查后悔药里有没有类似的
+  const { data: regrets } = await sb.from("wallet_regrets").select("*").ilike("item_name", "%" + item_name + "%");
+  let warning = null;
+  if (regrets && regrets.length > 0) {
+    warning = regrets.map(r => `你${r.buy_date}买过「${r.item_name}」(¥${r.amount})，后悔原因：${r.regret_reason}`).join("\n");
+  }
+
+  const { data, error } = await sb.from("wallet_requests").insert({
+    item_name, amount, reason: reason || null, alternative: alternative || null, image_url: image_url || null
+  }).select().single();
+
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ ok: true, id: data.id, warning });
+});
+
+// 获取审批列表
+app.get("/api/wallet/requests", async (req, res) => {
+  const status = req.query.status;
+  let q = sb.from("wallet_requests").select("*").order("created_at", { ascending: false });
+  if (status) q = q.eq("status", status);
+  const { data } = await q.limit(50);
+  res.json(data || []);
+});
+
+// 审批（同意/驳回）
+app.post("/api/wallet/review/:id", async (req, res) => {
+  const { status, review_comment } = req.body;
+  if (!["approved", "rejected"].includes(status)) return res.status(400).json({ error: "状态无效" });
+  const { error } = await sb.from("wallet_requests").update({
+    status, review_comment: review_comment || null, reviewed_at: new Date().toISOString()
+  }).eq("id", req.params.id);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ ok: true });
+});
+
+// 添加后悔药
+app.post("/api/wallet/regret", async (req, res) => {
+  const { item_name, amount, buy_date, regret_reason } = req.body;
+  if (!item_name || !regret_reason) return res.status(400).json({ error: "请填写物品和后悔原因" });
+  const { error } = await sb.from("wallet_regrets").insert({
+    item_name, amount: amount || 0, buy_date: buy_date || new Date().toISOString().split("T")[0], regret_reason
+  });
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ ok: true });
+});
+
+// 获取后悔药列表
+app.get("/api/wallet/regrets", async (req, res) => {
+  const { data } = await sb.from("wallet_regrets").select("*").order("created_at", { ascending: false }).limit(30);
+  res.json(data || []);
+});
+
+// 添加欠债
+app.post("/api/wallet/debt", async (req, res) => {
+  const { amount, source, reason } = req.body;
+  if (!amount) return res.status(400).json({ error: "请填写金额" });
+  const { error } = await sb.from("wallet_debts").insert({
+    amount, source: source || null, reason: reason || null, status: "unpaid"
+  });
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ ok: true });
+});
+
+// 还债
+app.post("/api/wallet/debt/pay/:id", async (req, res) => {
+  const { error } = await sb.from("wallet_debts").update({
+    status: "paid", paid_at: new Date().toISOString()
+  }).eq("id", req.params.id);
+  if (error) return res.status(500).json({ error: error.message });
+  res.json({ ok: true });
+});
+
+// 获取欠债列表
+app.get("/api/wallet/debts", async (req, res) => {
+  const show_paid = req.query.show_paid === "true";
+  let q = sb.from("wallet_debts").select("*").order("created_at", { ascending: false });
+  if (!show_paid) q = q.eq("status", "unpaid");
+  const { data } = await q.limit(50);
+  res.json(data || []);
+});
+
+// 欠债统计
+app.get("/api/wallet/debt/summary", async (req, res) => {
+  const { data: unpaid } = await sb.from("wallet_debts").select("amount").eq("status", "unpaid");
+  const { data: paid } = await sb.from("wallet_debts").select("amount").eq("status", "paid");
+  const totalUnpaid = (unpaid || []).reduce((s, r) => s + Number(r.amount), 0);
+  const totalPaid = (paid || []).reduce((s, r) => s + Number(r.amount), 0);
+  res.json({ unpaid: totalUnpaid, paid: totalPaid, total: totalUnpaid + totalPaid });
+});
+
 // ========== 聊天配置 API ==========
 
 // 获取所有配置
