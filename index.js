@@ -298,7 +298,7 @@ async function handleTool(name, args) {
       }
       case "review_wallet_request": {
         if (!["approved","rejected"].includes(args.status)) return "状态无效，请用 approved 或 rejected。";
-        const { data } = await sb.from("wallet_requests").select("*").ilike("id",args.id+"%").limit(1);
+        const { data } = await sb.from("wallet_requests").select("*").filter("id::text","ilike",args.id+"%").limit(1);
         if (!data||data.length===0) return "没有找到这条审批。";
         await sb.from("wallet_requests").update({
           status:args.status, review_comment:args.review_comment||null, reviewed_at:new Date().toISOString()
