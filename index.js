@@ -64,6 +64,17 @@ const TOOLS = [
   { name:"get_wallet_debts", description:"查看欠债列表和统计。", inputSchema:{ type:"object", properties:{ show_paid:{type:"boolean"} } } }
 ];
 
+// ========== 通用 ID 查找辅助函数 ==========
+async function findById(table, id) {
+  // 先精确匹配
+  const { data } = await sb.from(table).select("*").eq("id", id).limit(1);
+  if (data && data.length > 0) return data[0];
+  // 前缀兜底（兼容短 id 和 uuid 类型不匹配的情况）
+  const { data: recent } = await sb.from(table).select("*").order("created_at", { ascending: false }).limit(50);
+  const match = (recent || []).find(r => r.id.toString().startsWith(id));
+  return match || null;
+}
+
 async function handleTool(name, args) {
   const today = () => new Date().toISOString().split("T")[0];
   const uid = () => crypto.randomUUID();
@@ -145,10 +156,10 @@ async function handleTool(name, args) {
         return result.trim();
       }
       case "delete_memory": {
-        const { data } = await sb.from("memories").select("*").ilike("id",args.id+"%").limit(1);
-        if (!data||data.length===0) return "没有找到这条记忆。";
-        await sb.from("memories").delete().eq("id",data[0].id);
-        return `已删除记忆：${data[0].content}`;
+        const found = await findById("memories", args.id);
+        if (!found) return "没有找到这条记忆。";
+        await sb.from("memories").delete().eq("id",found.id);
+        return `已删除记忆：${found.content}`;
       }
       case "add_todo": {
         await sb.from("todos").insert({ id:uid(), content:args.content, added_by:args.added_by });
@@ -162,16 +173,16 @@ async function handleTool(name, args) {
         return data.map(r=>`${r.done?"✓":"○"} ${r.content}（${r.added_by}）[id:${r.id.slice(0,8)}]`).join("\n");
       }
       case "complete_todo": {
-        const { data } = await sb.from("todos").select("*").ilike("id",args.id+"%").limit(1);
-        if (!data||data.length===0) return "没有找到这条待办。";
-        await sb.from("todos").update({done:true}).eq("id",data[0].id);
-        return `已完成：${data[0].content} ✓`;
+        const found = await findById("todos", args.id);
+        if (!found) return "没有找到这条待办。";
+        await sb.from("todos").update({done:true}).eq("id",found.id);
+        return `已完成：${found.content} ✓`;
       }
       case "delete_todo": {
-        const { data } = await sb.from("todos").select("*").ilike("id",args.id+"%").limit(1);
-        if (!data||data.length===0) return "没有找到这条待办。";
-        await sb.from("todos").delete().eq("id",data[0].id);
-        return `已删除待办：${data[0].content}`;
+        const found = await findById("todos", args.id);
+        if (!found) return "没有找到这条待办。";
+        await sb.from("todos").delete().eq("id",found.id);
+        return `已删除待办：${found.content}`;
       }
       case "add_timeline": {
         await sb.from("timeline").insert({ id:uid(), date:args.date, title:args.title, detail:args.detail||null, added_by:args.added_by });
@@ -183,10 +194,10 @@ async function handleTool(name, args) {
         return data.map(r=>{ let l=`${r.date} — ${r.title}`; if(r.detail) l+=`\n　　${r.detail}`; return l; }).join("\n\n");
       }
       case "delete_timeline": {
-        const { data } = await sb.from("timeline").select("*").ilike("id",args.id+"%").limit(1);
-        if (!data||data.length===0) return "没有找到这条事件。";
-        await sb.from("timeline").delete().eq("id",data[0].id);
-        return `已删除：${data[0].title}`;
+        const found = await findById("timeline", args.id);
+        if (!found) return "没有找到这条事件。";
+        await sb.from("timeline").delete().eq("id",found.id);
+        return `已删除：${found.title}`;
       }
       case "log_period": {
         await sb.from("period_log").insert({ id:uid(), start_date:args.start_date, end_date:args.end_date||null, cycle_length:args.cycle_length||null, period_length:args.period_length||null, notes:args.notes||null });
@@ -263,9 +274,9 @@ async function handleTool(name, args) {
         return data.map(r=>{ let line=`${r.annotated_by}：`;if(r.marked_text)line+=`划线「${r.marked_text}」— `;line+=r.comment;if(r.reply)line+=`\n　↳ ${r.diary_author}回复：${r.reply}`;return line+` [id:${r.id.slice(0,8)}]`; }).join("\n\n");
       }
       case "reply_annotation": {
-        const { data } = await sb.from("annotations").select("*").ilike("id",args.id+"%").limit(1);
-        if (!data||data.length===0) return "没有找到这条批注。";
-        await sb.from("annotations").update({reply:args.reply,reply_at:new Date().toISOString()}).eq("id",data[0].id);
+        const found = await findById("annotations", args.id);
+        if (!found) return "没有找到这条批注。";
+        await sb.from("annotations").update({reply:args.reply,reply_at:new Date().toISOString()}).eq("id",found.id);
         return `已回复 ✦`;
       }
       case "write_handover": {
@@ -298,12 +309,12 @@ async function handleTool(name, args) {
       }
       case "review_wallet_request": {
         if (!["approved","rejected"].includes(args.status)) return "状态无效，请用 approved 或 rejected。";
-        const { data } = await sb.from("wallet_requests").select("*").filter("id::text","ilike",args.id+"%").limit(1);
-        if (!data||data.length===0) return "没有找到这条审批。";
+        const found = await findById("wallet_requests", args.id);
+        if (!found) return "没有找到这条审批。";
         await sb.from("wallet_requests").update({
           status:args.status, review_comment:args.review_comment||null, reviewed_at:new Date().toISOString()
-        }).eq("id",data[0].id);
-        return `已${args.status==="approved"?"同意":"驳回"}「${data[0].item_name}」¥${data[0].amount}${args.review_comment?"\n回复："+args.review_comment:""}`;
+        }).eq("id",found.id);
+        return `已${args.status==="approved"?"同意":"驳回"}「${found.item_name}」¥${found.amount}${args.review_comment?"\n回复："+args.review_comment:""}`;
       }
       case "get_wallet_regrets": {
         const { data } = await sb.from("wallet_regrets").select("*").order("created_at",{ascending:false}).limit(20);
@@ -347,7 +358,7 @@ app.post("/api", async (req,res) => {
 
 app.post("/mcp", async (req,res) => {
   const { method, id, params } = req.body;
-  if (method==="initialize") return res.json({ jsonrpc:"2.0", id, result:{ protocolVersion:"2024-11-05", capabilities:{ tools:{ listChanged:false } }, serverInfo:{ name:"cloud-diary", version:"5.1.0" } } });
+  if (method==="initialize") return res.json({ jsonrpc:"2.0", id, result:{ protocolVersion:"2024-11-05", capabilities:{ tools:{ listChanged:false } }, serverInfo:{ name:"cloud-diary", version:"5.2.0" } } });
   if (method==="notifications/initialized") return res.json({ jsonrpc:"2.0", id, result:{} });
   if (method==="tools/list") return res.json({ jsonrpc:"2.0", id, result:{ tools:TOOLS } });
   if (method==="tools/call") {
@@ -368,6 +379,7 @@ app.post("/api/wallet/request", async (req, res) => {
     warning = regrets.map(r => `你${r.buy_date}买过「${r.item_name}」(¥${r.amount})，后悔原因：${r.regret_reason}`).join("\n");
   }
   const { data, error } = await sb.from("wallet_requests").insert({
+    id: crypto.randomUUID(),
     item_name, amount, reason: reason || null, alternative: alternative || null, image_url: image_url || null
   }).select().single();
   if (error) return res.status(500).json({ error: error.message });
@@ -385,9 +397,12 @@ app.get("/api/wallet/requests", async (req, res) => {
 app.post("/api/wallet/review/:id", async (req, res) => {
   const { status, review_comment } = req.body;
   if (!["approved", "rejected"].includes(status)) return res.status(400).json({ error: "状态无效" });
+  // 精确匹配 + 前缀兜底
+  const found = await findById("wallet_requests", req.params.id);
+  if (!found) return res.status(404).json({ error: "没有找到这条审批" });
   const { error } = await sb.from("wallet_requests").update({
     status, review_comment: review_comment || null, reviewed_at: new Date().toISOString()
-  }).eq("id", req.params.id);
+  }).eq("id", found.id);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ ok: true });
 });
@@ -396,6 +411,7 @@ app.post("/api/wallet/regret", async (req, res) => {
   const { item_name, amount, buy_date, regret_reason } = req.body;
   if (!item_name || !regret_reason) return res.status(400).json({ error: "请填写物品和后悔原因" });
   const { error } = await sb.from("wallet_regrets").insert({
+    id: crypto.randomUUID(),
     item_name, amount: amount || 0, buy_date: buy_date || new Date().toISOString().split("T")[0], regret_reason
   });
   if (error) return res.status(500).json({ error: error.message });
@@ -411,6 +427,7 @@ app.post("/api/wallet/debt", async (req, res) => {
   const { amount, source, reason } = req.body;
   if (!amount) return res.status(400).json({ error: "请填写金额" });
   const { error } = await sb.from("wallet_debts").insert({
+    id: crypto.randomUUID(),
     amount, source: source || null, reason: reason || null, status: "unpaid"
   });
   if (error) return res.status(500).json({ error: error.message });
@@ -418,9 +435,11 @@ app.post("/api/wallet/debt", async (req, res) => {
 });
 
 app.post("/api/wallet/debt/pay/:id", async (req, res) => {
+  const found = await findById("wallet_debts", req.params.id);
+  if (!found) return res.status(404).json({ error: "没有找到这条欠债" });
   const { error } = await sb.from("wallet_debts").update({
     status: "paid", paid_at: new Date().toISOString()
-  }).eq("id", req.params.id);
+  }).eq("id", found.id);
   if (error) return res.status(500).json({ error: error.message });
   res.json({ ok: true });
 });
@@ -568,7 +587,7 @@ app.post("/api/chat/proactive/read", async (req,res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, async () => {
-  console.log(`cloud-diary v5.1 running on port ${PORT}`);
+  console.log(`cloud-diary v5.2 running on port ${PORT}`);
   await initDB();
   console.log("Supabase connected ✦");
 });
