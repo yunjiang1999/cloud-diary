@@ -290,6 +290,7 @@ const app = express();
 app.use(express.json());
 app.use(express.static("public"));
 
+// ========== 原有 MCP 路由 ==========
 app.post("/api", async (req,res) => {
   const { method, id, params } = req.body;
   if (method==="tools/call") {
@@ -301,7 +302,7 @@ app.post("/api", async (req,res) => {
 
 app.post("/mcp", async (req,res) => {
   const { method, id, params } = req.body;
-  if (method==="initialize") return res.json({ jsonrpc:"2.0", id, result:{ protocolVersion:"2024-11-05", capabilities:{ tools:{ listChanged:false } }, serverInfo:{ name:"cloud-diary", version:"4.1.0" } } });
+  if (method==="initialize") return res.json({ jsonrpc:"2.0", id, result:{ protocolVersion:"2024-11-05", capabilities:{ tools:{ listChanged:false } }, serverInfo:{ name:"cloud-diary", version:"5.0.0" } } });
   if (method==="notifications/initialized") return res.json({ jsonrpc:"2.0", id, result:{} });
   if (method==="tools/list") return res.json({ jsonrpc:"2.0", id, result:{ tools:TOOLS } });
   if (method==="tools/call") {
@@ -311,9 +312,136 @@ app.post("/mcp", async (req,res) => {
   res.json({ jsonrpc:"2.0", id, error:{ code:-32601, message:"Method not found" } });
 });
 
+// ========== 聊天配置 API ==========
+
+// 获取所有配置
+app.get("/api/chat/configs", async (req,res) => {
+  const { data } = await sb.from("chat_config").select("*").order("created_at");
+  res.json(data || []);
+});
+
+// 保存/更新配置
+app.post("/api/chat/config", async (req,res) => {
+  const { id, name, base_url, api_key, model, temperature, system_prompt, is_active } = req.body;
+  const cid = id || crypto.randomUUID();
+  // 如果设为激活，先把其他的都取消
+  if (is_active) {
+    await sb.from("chat_config").update({ is_active: false }).eq("is_active", true);
+  }
+  const { data: existing } = await sb.from("chat_config").select("id").eq("id", cid);
+  if (existing && existing.length > 0) {
+    await sb.from("chat_config").update({ name, base_url, api_key, model, temperature, system_prompt, is_active: is_active || false }).eq("id", cid);
+  } else {
+    await sb.from("chat_config").insert({ id: cid, name, base_url, api_key, model, temperature, system_prompt, is_active: is_active || false });
+  }
+  res.json({ ok: true, id: cid });
+});
+
+// 删除配置
+app.delete("/api/chat/config/:id", async (req,res) => {
+  await sb.from("chat_config").delete().eq("id", req.params.id);
+  res.json({ ok: true });
+});
+
+// 拉取模型列表
+app.post("/api/chat/models", async (req,res) => {
+  const { base_url, api_key } = req.body;
+  try {
+    const url = base_url.replace(/\/+$/, "") + "/v1/models";
+    const resp = await fetch(url, { headers: { "Authorization": `Bearer ${api_key}` } });
+    const json = await resp.json();
+    const models = (json.data || []).map(m => m.id).sort();
+    res.json(models);
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// ========== 聊天 API ==========
+
+// 获取聊天记录
+app.get("/api/chat/messages", async (req,res) => {
+  const limit = parseInt(req.query.limit) || 50;
+  const { data } = await sb.from("chat_messages").select("*").order("created_at", { ascending: false }).limit(limit);
+  res.json((data || []).reverse());
+});
+
+// 发送消息
+app.post("/api/chat/send", async (req,res) => {
+  const { message } = req.body;
+  const uid = () => crypto.randomUUID();
+
+  // 获取激活的配置
+  const { data: configs } = await sb.from("chat_config").select("*").eq("is_active", true).limit(1);
+  if (!configs || configs.length === 0) {
+    return res.status(400).json({ error: "没有激活的 API 配置，请先在设置里配置并保存。" });
+  }
+  const config = configs[0];
+
+  // 保存用户消息
+  await sb.from("chat_messages").insert({ id: uid(), role: "user", content: message });
+
+  // 获取最近的聊天记录作为上下文
+  const { data: history } = await sb.from("chat_messages").select("role, content").order("created_at", { ascending: false }).limit(40);
+  const messages = [
+    { role: "system", content: config.system_prompt || "你是一个AI助手。" },
+    ...(history || []).reverse()
+  ];
+
+  try {
+    const url = config.base_url.replace(/\/+$/, "") + "/v1/chat/completions";
+    const resp = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${config.api_key}`
+      },
+      body: JSON.stringify({
+        model: config.model,
+        messages,
+        temperature: config.temperature || 0.5
+      })
+    });
+    const json = await resp.json();
+
+    if (json.error) {
+      return res.status(500).json({ error: json.error.message || JSON.stringify(json.error) });
+    }
+
+    const reply = json.choices?.[0]?.message?.content || "（无回复）";
+
+    // 保存助手回复
+    await sb.from("chat_messages").insert({ id: uid(), role: "assistant", content: reply });
+
+    res.json({ reply });
+  } catch(e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
+// 清空聊天记录
+app.delete("/api/chat/messages", async (req,res) => {
+  await sb.from("chat_messages").delete().neq("id", "");
+  res.json({ ok: true });
+});
+
+// ========== 主动消息 API ==========
+
+// 获取未读主动消息
+app.get("/api/chat/proactive", async (req,res) => {
+  const { data } = await sb.from("proactive_messages").select("*").eq("is_read", false).order("created_at");
+  res.json(data || []);
+});
+
+// 标记已读
+app.post("/api/chat/proactive/read", async (req,res) => {
+  await sb.from("proactive_messages").update({ is_read: true }).eq("is_read", false);
+  res.json({ ok: true });
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, async () => {
-  console.log(`cloud-diary v4.1 running on port ${PORT}`);
+  console.log(`cloud-diary v5.0 running on port ${PORT}`);
   await initDB();
   console.log("Supabase connected ✦");
 });
