@@ -236,6 +236,20 @@
     <!-- 还债 -->
     <div class="tab-panel" id="panel-debt">
       <div id="debtSummary"></div>
+
+      <!-- 账单明细 -->
+      <div class="w-card" style="padding:16px 14px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;position:relative;z-index:1">
+          <div style="font-size:11px;color:var(--text);font-weight:600;letter-spacing:1px">📋 账单明细</div>
+          <div style="display:flex;gap:6px">
+            <button class="w-btn" style="margin:0;padding:5px 12px;font-size:10px" onclick="loadDebts(false)" id="debt-filter-unpaid">待还</button>
+            <button class="w-btn" style="margin:0;padding:5px 12px;font-size:10px" onclick="loadDebts(true)" id="debt-filter-all">全部</button>
+          </div>
+        </div>
+        <div id="debtList"></div>
+      </div>
+
+      <!-- 记录新债 -->
       <div class="w-card">
         <div style="text-align:center;margin-bottom:14px;position:relative;z-index:1">
           <div style="font-size:10px;color:var(--text-light);letter-spacing:2px">📝 记录一笔债</div>
@@ -255,6 +269,8 @@
         <div style="text-align:center;position:relative;z-index:1">
           <button class="w-btn primary" onclick="submitDebt()">记录欠债</button>
         </div>
+      </div>
+    </div>
       </div>
       <div id="debtList"></div>
     </div>
@@ -431,51 +447,43 @@ async function loadDebtSummary(){
     </div>`;
 }
 
-async function submitDebt(){
-  const amount=parseFloat(document.getElementById("debtAmount").value);
-  const source=document.getElementById("debtSource").value.trim();
-  const reason=document.getElementById("debtReason").value.trim();
-  if(!amount||amount<=0)return toast("填个金额");
-
-  await fetch(API+"/api/wallet/debt",{
-    method:"POST",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({amount,source,reason})
-  });
-  toast("已记录 📝");
-  document.getElementById("debtAmount").value="";
-  document.getElementById("debtSource").value="";
-  document.getElementById("debtReason").value="";
-  loadDebtSummary();loadDebts();
-}
-
-async function loadDebts(){
-  const resp=await fetch(API+"/api/wallet/debts?show_paid=true");
+async function loadDebts(showPaid){
+  if(showPaid===undefined) showPaid=false;
+  const resp=await fetch(API+"/api/wallet/debts?show_paid="+showPaid);
   const list=await resp.json();
   const el=document.getElementById("debtList");
+
+  // 更新筛选按钮状态
+  document.getElementById("debt-filter-unpaid").style.background=showPaid?"":"var(--text)";
+  document.getElementById("debt-filter-unpaid").style.color=showPaid?"":"white";
+  document.getElementById("debt-filter-all").style.background=showPaid?"var(--text)":"";
+  document.getElementById("debt-filter-all").style.color=showPaid?"white":"";
+
   if(list.length===0){
     el.innerHTML='<div style="text-align:center;padding:20px;font-size:11px;color:var(--text-light);font-style:italic">零欠债，好孩子</div>';
     return;
   }
-  el.innerHTML='<div class="w-card">'+list.map(r=>{
+  el.innerHTML=list.map(r=>{
     const isPaid=r.status==="paid";
-    return `<div class="debt-item">
-      <div class="debt-info">
-        <div class="debt-amount ${isPaid?"debt-paid":""}">${Number(r.amount).toFixed(2)}</div>
-        <div class="debt-source">${esc(r.source||"未知来源")}${r.reason?" · "+esc(r.reason):""}</div>
+    const date=r.created_at?r.created_at.slice(0,10):"";
+    const paidDate=r.paid_at?r.paid_at.slice(0,10):"";
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 4px;border-bottom:1px solid rgba(189,187,191,.1);position:relative;z-index:1">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:baseline;gap:6px">
+          <span style="font-size:18px;font-weight:700;color:${isPaid?"var(--text-light)":"#c47070"};${isPaid?"text-decoration:line-through":""}">¥${Number(r.amount).toFixed(2)}</span>
+          ${isPaid?'<span style="font-size:9px;color:#5a8a5a;background:rgba(130,180,130,.15);padding:2px 8px;border-radius:8px">已还</span>':'<span style="font-size:9px;color:#a08a40;background:rgba(200,180,100,.15);padding:2px 8px;border-radius:8px">待还</span>'}
+        </div>
+        <div style="font-size:10px;color:var(--text-light);margin-top:3px">
+          ${esc(r.source||"未知来源")}${r.reason?" · "+esc(r.reason):""}
+        </div>
+        <div style="font-size:9px;color:var(--border);margin-top:2px">
+          ${date}${isPaid?" → 还清于 "+paidDate:""}
+        </div>
       </div>
-      ${isPaid?'<span class="w-status approved">已还</span>':
-        '<button class="w-btn success" onclick="payDebt(\''+r.id+'\')">还清</button>'}
+      ${isPaid?"":`<button class="w-btn success" style="margin:0;padding:6px 14px;font-size:10px" onclick="payDebt('${r.id}')">还清</button>`}
     </div>`;
-  }).join("")+'</div>';
+  }).join("");
 }
-
-async function payDebt(id){
-  await fetch(API+"/api/wallet/debt/pay/"+id,{method:"POST"});
-  toast("已还清 ✓");
-  loadDebtSummary();loadDebts();
-}
-
-function esc(s){return s?s.replace(/</g,"&lt;").replace(/>/g,"&gt;"):""}
 </script>
 </body>
 </html>
