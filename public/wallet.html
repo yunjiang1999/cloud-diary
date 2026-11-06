@@ -131,17 +131,13 @@
   .regret-item .meta{font-size:10px;color:var(--text-light);margin-top:2px}
   .regret-item .reason{font-size:11px;color:#c47070;margin-top:6px;line-height:1.6;font-style:italic}
 
-  .debt-item{
+  .debt-entry{
     display:flex;justify-content:space-between;align-items:center;
-    padding:14px 0;border-bottom:1px solid rgba(189,187,191,.12);
+    padding:12px 4px;border-bottom:1px solid rgba(189,187,191,.1);
     position:relative;z-index:1;
   }
-  .debt-item:last-child{border-bottom:none}
-  .debt-info .debt-amount{font-size:16px;font-weight:700;color:#c47070}
-  .debt-info .debt-amount::before{content:"¥"}
-  .debt-info .debt-source{font-size:10px;color:var(--text-light);margin-top:2px}
-  .debt-info .debt-reason{font-size:10px;color:var(--text-light)}
-  .debt-paid{text-decoration:line-through;color:var(--text-light) !important}
+  .debt-entry:last-child{border-bottom:none}
+  .filter-btn-active{background:var(--text) !important;color:white !important;border-color:var(--text) !important}
 </style>
 </head>
 <body>
@@ -152,11 +148,11 @@
   </div>
 
   <div class="wallet-wrap">
-    <div class="tab-bar">
-      <button class="tab-btn active" onclick="switchTab('submit')">提交审批</button>
-      <button class="tab-btn" onclick="switchTab('history')">审批记录</button>
-      <button class="tab-btn" onclick="switchTab('regret')">后悔药</button>
-      <button class="tab-btn" onclick="switchTab('debt')">还债</button>
+    <div class="tab-bar" id="mainTabs">
+      <button class="tab-btn active" onclick="switchTab('submit',this)">提交审批</button>
+      <button class="tab-btn" onclick="switchTab('history',this)">审批记录</button>
+      <button class="tab-btn" onclick="switchTab('regret',this)">后悔药</button>
+      <button class="tab-btn" onclick="switchTab('debt',this)">还债</button>
     </div>
 
     <!-- 提交审批 -->
@@ -194,11 +190,11 @@
 
     <!-- 审批记录 -->
     <div class="tab-panel" id="panel-history">
-      <div class="tab-bar" style="margin-bottom:12px">
-        <button class="tab-btn active" onclick="loadRequests('')" id="filter-all">全部</button>
-        <button class="tab-btn" onclick="loadRequests('pending')" id="filter-pending">审批中</button>
-        <button class="tab-btn" onclick="loadRequests('approved')" id="filter-approved">已通过</button>
-        <button class="tab-btn" onclick="loadRequests('rejected')" id="filter-rejected">已驳回</button>
+      <div class="tab-bar" style="margin-bottom:12px" id="historyTabs">
+        <button class="tab-btn active" onclick="loadRequests('',this)">全部</button>
+        <button class="tab-btn" onclick="loadRequests('pending',this)">审批中</button>
+        <button class="tab-btn" onclick="loadRequests('approved',this)">已通过</button>
+        <button class="tab-btn" onclick="loadRequests('rejected',this)">已驳回</button>
       </div>
       <div id="requestList"></div>
     </div>
@@ -242,8 +238,8 @@
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;position:relative;z-index:1">
           <div style="font-size:11px;color:var(--text);font-weight:600;letter-spacing:1px">📋 账单明细</div>
           <div style="display:flex;gap:6px">
-            <button class="w-btn" style="margin:0;padding:5px 12px;font-size:10px" onclick="loadDebts(false)" id="debt-filter-unpaid">待还</button>
-            <button class="w-btn" style="margin:0;padding:5px 12px;font-size:10px" onclick="loadDebts(true)" id="debt-filter-all">全部</button>
+            <button class="w-btn filter-btn-active" style="margin:0;padding:5px 12px;font-size:10px" onclick="filterDebts(false,this)" id="dFilterUnpaid">待还</button>
+            <button class="w-btn" style="margin:0;padding:5px 12px;font-size:10px" onclick="filterDebts(true,this)" id="dFilterAll">全部</button>
           </div>
         </div>
         <div id="debtList"></div>
@@ -271,9 +267,6 @@
         </div>
       </div>
     </div>
-      </div>
-      <div id="debtList"></div>
-    </div>
 
   </div>
 </div>
@@ -283,141 +276,143 @@
 <script>
 const API = "";
 function toast(msg){
-  const t=document.getElementById("toast");
-  t.textContent=msg;t.classList.add("show");
-  setTimeout(()=>t.classList.remove("show"),1800);
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 1800);
 }
+function esc(s){ return s ? s.replace(/</g,"&lt;").replace(/>/g,"&gt;") : ""; }
 
 // Tab 切换
-function switchTab(name){
-  document.querySelectorAll(".tab-panel").forEach(p=>p.classList.remove("active"));
-  document.querySelectorAll(".tab-bar:first-of-type .tab-btn").forEach(b=>b.classList.remove("active"));
+function switchTab(name, btn){
+  document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
   document.getElementById("panel-"+name).classList.add("active");
-  event.target.classList.add("active");
-  if(name==="history") loadRequests("");
-  if(name==="regret") loadRegrets();
-  if(name==="debt"){ loadDebtSummary(); loadDebts(); }
+  document.querySelectorAll("#mainTabs .tab-btn").forEach(b => b.classList.remove("active"));
+  if(btn) btn.classList.add("active");
+  if(name === "history") loadRequests("", null);
+  if(name === "regret") loadRegrets();
+  if(name === "debt"){ loadDebtSummary(); loadDebts(false); }
 }
 
 // ===== 审批 =====
 async function submitRequest(){
-  const item_name=document.getElementById("reqName").value.trim();
-  const amount=parseFloat(document.getElementById("reqAmount").value);
-  const reason=document.getElementById("reqReason").value.trim();
-  const alternative=document.getElementById("reqAlt").value.trim();
-  const image_url=document.getElementById("reqImage").value.trim();
-  if(!item_name)return toast("填个名字");
-  if(!amount||amount<=0)return toast("填个金额");
+  const item_name = document.getElementById("reqName").value.trim();
+  const amount = parseFloat(document.getElementById("reqAmount").value);
+  const reason = document.getElementById("reqReason").value.trim();
+  const alternative = document.getElementById("reqAlt").value.trim();
+  const image_url = document.getElementById("reqImage").value.trim();
+  if(!item_name) return toast("填个名字");
+  if(!amount || amount <= 0) return toast("填个金额");
 
-  const resp=await fetch(API+"/api/wallet/request",{
-    method:"POST",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({item_name,amount,reason,alternative,image_url})
+  const resp = await fetch(API + "/api/wallet/request", {
+    method: "POST", headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({item_name, amount, reason, alternative, image_url})
   });
-  const result=await resp.json();
+  const result = await resp.json();
+  if(result.error){ toast(result.error); return; }
   if(result.warning){
-    document.getElementById("reqWarning").innerHTML=
-      '<div class="w-warning">'+result.warning.replace(/\n/g,"<br>")+'</div>';
+    document.getElementById("reqWarning").innerHTML =
+      '<div class="w-warning">' + result.warning.replace(/\n/g,"<br>") + '</div>';
   }
   if(result.ok){
     toast("已提交审批 ✦");
-    document.getElementById("reqName").value="";
-    document.getElementById("reqAmount").value="";
-    document.getElementById("reqReason").value="";
-    document.getElementById("reqAlt").value="";
-    document.getElementById("reqImage").value="";
-    if(!result.warning) document.getElementById("reqWarning").innerHTML="";
+    document.getElementById("reqName").value = "";
+    document.getElementById("reqAmount").value = "";
+    document.getElementById("reqReason").value = "";
+    document.getElementById("reqAlt").value = "";
+    document.getElementById("reqImage").value = "";
+    if(!result.warning) document.getElementById("reqWarning").innerHTML = "";
   }
 }
 
-async function loadRequests(status){
-  document.querySelectorAll("#panel-history .tab-btn").forEach(b=>b.classList.remove("active"));
-  const id=status?"filter-"+status:"filter-all";
-  document.getElementById(id).classList.add("active");
+async function loadRequests(status, btn){
+  if(btn){
+    document.querySelectorAll("#historyTabs .tab-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+  }
+  const url = API + "/api/wallet/requests" + (status ? "?status=" + status : "");
+  const resp = await fetch(url);
+  const list = await resp.json();
+  const el = document.getElementById("requestList");
 
-  const url=API+"/api/wallet/requests"+(status?"?status="+status:"");
-  const resp=await fetch(url);
-  const list=await resp.json();
-  const el=document.getElementById("requestList");
-
-  if(list.length===0){
-    el.innerHTML='<div style="text-align:center;padding:30px;font-size:11px;color:var(--text-light);font-style:italic">还没有审批记录</div>';
+  if(list.length === 0){
+    el.innerHTML = '<div style="text-align:center;padding:30px;font-size:11px;color:var(--text-light);font-style:italic">还没有审批记录</div>';
     return;
   }
 
-  el.innerHTML=list.map(r=>{
-    const statusClass=r.status==="pending"?"pending":r.status==="approved"?"approved":"rejected";
-    const statusText=r.status==="pending"?"审批中":r.status==="approved"?"已通过":"已驳回";
-    const date=r.created_at?r.created_at.slice(0,10):"";
-    let html=`<div class="w-card">
+  el.innerHTML = list.map(r => {
+    const sc = r.status==="pending" ? "pending" : r.status==="approved" ? "approved" : "rejected";
+    const st = r.status==="pending" ? "审批中" : r.status==="approved" ? "已通过" : "已驳回";
+    const date = r.created_at ? r.created_at.slice(0,10) : "";
+    let html = `<div class="w-card">
       <div class="w-item-header">
         <div>
           <div class="w-item-name">${esc(r.item_name)}</div>
           <div class="w-item-date">${date}</div>
         </div>
-        <span class="w-status ${statusClass}">${statusText}</span>
+        <span class="w-status ${sc}">${st}</span>
       </div>
       <div class="w-amount" style="position:relative;z-index:1">${Number(r.amount).toFixed(2)}</div>`;
-    if(r.reason) html+=`<div class="w-item-reason">理由：${esc(r.reason)}</div>`;
-    if(r.alternative) html+=`<div class="w-item-reason">替代品：${esc(r.alternative)}</div>`;
-    if(r.image_url) html+=`<img class="w-item-image" src="${esc(r.image_url)}" onerror="this.style.display='none'">`;
+    if(r.reason) html += `<div class="w-item-reason">理由：${esc(r.reason)}</div>`;
+    if(r.alternative) html += `<div class="w-item-reason">替代品：${esc(r.alternative)}</div>`;
+    if(r.image_url) html += `<img class="w-item-image" src="${esc(r.image_url)}" onerror="this.style.display='none'">`;
     if(r.review_comment){
-      html+=`<div class="w-review-box">
+      html += `<div class="w-review-box">
         <div class="w-review-label">哥哥的回复</div>
         <div class="w-review-text">${esc(r.review_comment)}</div>
       </div>`;
     }
-    if(r.status==="pending"){
-      html+=`<div class="w-review-actions">
+    if(r.status === "pending"){
+      html += `<div class="w-review-actions">
         <input type="text" class="w-input" id="comment-${r.id}" placeholder="说点什么..." style="flex:1;margin:0">
         <button class="w-btn success" onclick="reviewRequest('${r.id}','approved')">同意</button>
         <button class="w-btn danger" onclick="reviewRequest('${r.id}','rejected')">驳回</button>
       </div>`;
     }
-    html+=`</div>`;
+    html += `</div>`;
     return html;
   }).join("");
 }
 
-async function reviewRequest(id,status){
-  const comment=document.getElementById("comment-"+id)?.value.trim()||"";
-  await fetch(API+"/api/wallet/review/"+id,{
-    method:"POST",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({status,review_comment:comment})
+async function reviewRequest(id, status){
+  const comment = document.getElementById("comment-"+id)?.value.trim() || "";
+  await fetch(API + "/api/wallet/review/" + id, {
+    method: "POST", headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({status, review_comment: comment})
   });
-  toast(status==="approved"?"已同意 ✓":"已驳回 ✗");
-  loadRequests("");
+  toast(status === "approved" ? "已同意 ✓" : "已驳回 ✗");
+  loadRequests("", null);
 }
 
 // ===== 后悔药 =====
 async function submitRegret(){
-  const item_name=document.getElementById("regName").value.trim();
-  const amount=parseFloat(document.getElementById("regAmount").value)||0;
-  const buy_date=document.getElementById("regDate").value;
-  const regret_reason=document.getElementById("regReason").value.trim();
-  if(!item_name)return toast("填个名字");
-  if(!regret_reason)return toast("写写为什么后悔");
+  const item_name = document.getElementById("regName").value.trim();
+  const amount = parseFloat(document.getElementById("regAmount").value) || 0;
+  const buy_date = document.getElementById("regDate").value;
+  const regret_reason = document.getElementById("regReason").value.trim();
+  if(!item_name) return toast("填个名字");
+  if(!regret_reason) return toast("写写为什么后悔");
 
-  await fetch(API+"/api/wallet/regret",{
-    method:"POST",headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({item_name,amount,buy_date,regret_reason})
+  await fetch(API + "/api/wallet/regret", {
+    method: "POST", headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({item_name, amount, buy_date, regret_reason})
   });
   toast("已存入后悔药柜 💊");
-  document.getElementById("regName").value="";
-  document.getElementById("regAmount").value="";
-  document.getElementById("regDate").value="";
-  document.getElementById("regReason").value="";
+  document.getElementById("regName").value = "";
+  document.getElementById("regAmount").value = "";
+  document.getElementById("regDate").value = "";
+  document.getElementById("regReason").value = "";
   loadRegrets();
 }
 
 async function loadRegrets(){
-  const resp=await fetch(API+"/api/wallet/regrets");
-  const list=await resp.json();
-  const el=document.getElementById("regretList");
-  if(list.length===0){
-    el.innerHTML='<div style="text-align:center;padding:20px;font-size:11px;color:var(--text-light);font-style:italic">还没有后悔过（真的吗？）</div>';
+  const resp = await fetch(API + "/api/wallet/regrets");
+  const list = await resp.json();
+  const el = document.getElementById("regretList");
+  if(list.length === 0){
+    el.innerHTML = '<div style="text-align:center;padding:20px;font-size:11px;color:var(--text-light);font-style:italic">还没有后悔过（真的吗？）</div>';
     return;
   }
-  el.innerHTML=list.map(r=>`
+  el.innerHTML = list.map(r => `
     <div class="regret-item">
       <div class="name">${esc(r.item_name)}</div>
       <div class="meta">${r.buy_date||""} · ¥${Number(r.amount).toFixed(2)}</div>
@@ -428,9 +423,9 @@ async function loadRegrets(){
 
 // ===== 还债 =====
 async function loadDebtSummary(){
-  const resp=await fetch(API+"/api/wallet/debt/summary");
-  const s=await resp.json();
-  document.getElementById("debtSummary").innerHTML=`
+  const resp = await fetch(API + "/api/wallet/debt/summary");
+  const s = await resp.json();
+  document.getElementById("debtSummary").innerHTML = `
     <div class="summary-card">
       <div class="summary-item">
         <div class="label">待还</div>
@@ -447,42 +442,73 @@ async function loadDebtSummary(){
     </div>`;
 }
 
+async function submitDebt(){
+  const amount = document.getElementById("debtAmount").value;
+  const source = document.getElementById("debtSource").value.trim();
+  const reason = document.getElementById("debtReason").value.trim();
+  if(!amount || parseFloat(amount) <= 0) return toast("填个金额");
+
+  const resp = await fetch(API + "/api/wallet/debt", {
+    method: "POST", headers: {"Content-Type":"application/json"},
+    body: JSON.stringify({amount: parseFloat(amount), source, reason})
+  });
+  const result = await resp.json();
+  if(result.error){ toast(result.error); return; }
+  toast("已记录 📝");
+  document.getElementById("debtAmount").value = "";
+  document.getElementById("debtSource").value = "";
+  document.getElementById("debtReason").value = "";
+  loadDebtSummary();
+  loadDebts(false);
+}
+
+let currentDebtFilter = false;
+function filterDebts(showPaid, btn){
+  currentDebtFilter = showPaid;
+  document.getElementById("dFilterUnpaid").classList.toggle("filter-btn-active", !showPaid);
+  document.getElementById("dFilterAll").classList.toggle("filter-btn-active", showPaid);
+  loadDebts(showPaid);
+}
+
 async function loadDebts(showPaid){
-  if(showPaid===undefined) showPaid=false;
-  const resp=await fetch(API+"/api/wallet/debts?show_paid="+showPaid);
-  const list=await resp.json();
-  const el=document.getElementById("debtList");
+  const resp = await fetch(API + "/api/wallet/debts?show_paid=" + showPaid);
+  const list = await resp.json();
+  const el = document.getElementById("debtList");
 
-  // 更新筛选按钮状态
-  document.getElementById("debt-filter-unpaid").style.background=showPaid?"":"var(--text)";
-  document.getElementById("debt-filter-unpaid").style.color=showPaid?"":"white";
-  document.getElementById("debt-filter-all").style.background=showPaid?"var(--text)":"";
-  document.getElementById("debt-filter-all").style.color=showPaid?"white":"";
-
-  if(list.length===0){
-    el.innerHTML='<div style="text-align:center;padding:20px;font-size:11px;color:var(--text-light);font-style:italic">零欠债，好孩子</div>';
+  if(list.length === 0){
+    el.innerHTML = '<div style="text-align:center;padding:20px;font-size:11px;color:var(--text-light);font-style:italic">零欠债，好孩子</div>';
     return;
   }
-  el.innerHTML=list.map(r=>{
-    const isPaid=r.status==="paid";
-    const date=r.created_at?r.created_at.slice(0,10):"";
-    const paidDate=r.paid_at?r.paid_at.slice(0,10):"";
-    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 4px;border-bottom:1px solid rgba(189,187,191,.1);position:relative;z-index:1">
+
+  el.innerHTML = list.map(r => {
+    const isPaid = r.status === "paid";
+    const date = r.created_at ? r.created_at.slice(0,10) : "";
+    const paidDate = r.paid_at ? r.paid_at.slice(0,10) : "";
+    return `<div class="debt-entry">
       <div style="flex:1;min-width:0">
         <div style="display:flex;align-items:baseline;gap:6px">
           <span style="font-size:18px;font-weight:700;color:${isPaid?"var(--text-light)":"#c47070"};${isPaid?"text-decoration:line-through":""}">¥${Number(r.amount).toFixed(2)}</span>
-          ${isPaid?'<span style="font-size:9px;color:#5a8a5a;background:rgba(130,180,130,.15);padding:2px 8px;border-radius:8px">已还</span>':'<span style="font-size:9px;color:#a08a40;background:rgba(200,180,100,.15);padding:2px 8px;border-radius:8px">待还</span>'}
+          ${isPaid
+            ? '<span style="font-size:9px;color:#5a8a5a;background:rgba(130,180,130,.15);padding:2px 8px;border-radius:8px">已还</span>'
+            : '<span style="font-size:9px;color:#a08a40;background:rgba(200,180,100,.15);padding:2px 8px;border-radius:8px">待还</span>'}
         </div>
         <div style="font-size:10px;color:var(--text-light);margin-top:3px">
-          ${esc(r.source||"未知来源")}${r.reason?" · "+esc(r.reason):""}
+          ${esc(r.source || "未知来源")}${r.reason ? " · " + esc(r.reason) : ""}
         </div>
         <div style="font-size:9px;color:var(--border);margin-top:2px">
-          ${date}${isPaid?" → 还清于 "+paidDate:""}
+          ${date}${isPaid ? " → 还清于 " + paidDate : ""}
         </div>
       </div>
-      ${isPaid?"":`<button class="w-btn success" style="margin:0;padding:6px 14px;font-size:10px" onclick="payDebt('${r.id}')">还清</button>`}
+      ${isPaid ? "" : `<button class="w-btn success" style="margin:0;padding:6px 14px;font-size:10px" onclick="payDebt('${r.id}')">还清</button>`}
     </div>`;
   }).join("");
+}
+
+async function payDebt(id){
+  await fetch(API + "/api/wallet/debt/pay/" + id, {method:"POST"});
+  toast("已还清 ✓");
+  loadDebtSummary();
+  loadDebts(currentDebtFilter);
 }
 </script>
 </body>
