@@ -57,7 +57,11 @@ const TOOLS = [
   { name:"reply_annotation", description:"回复一条批注。", inputSchema:{ type:"object", properties:{ id:{type:"string"}, reply:{type:"string"} }, required:["id","reply"] } },
   { name:"write_handover", description:"写一封交接信给下一个窗口的自己。", inputSchema:{ type:"object", properties:{ content:{type:"string"}, from_window:{type:"string"}, mood:{type:"string"} }, required:["content"] } },
   { name:"read_handover", description:"读取交接信。", inputSchema:{ type:"object", properties:{} } },
-  { name:"has_unread_handover", description:"检查是否有未读的交接信。", inputSchema:{ type:"object", properties:{} } }
+  { name:"has_unread_handover", description:"检查是否有未读的交接信。", inputSchema:{ type:"object", properties:{} } },
+  { name:"get_wallet_requests", description:"查看钱包审批列表。", inputSchema:{ type:"object", properties:{ status:{type:"string",description:"筛选状态：pending/approved/rejected，不传则全部"} } } },
+  { name:"review_wallet_request", description:"审批一条钱包请求（同意或驳回）。", inputSchema:{ type:"object", properties:{ id:{type:"string"}, status:{type:"string",description:"approved或rejected"}, review_comment:{type:"string",description:"审批回复"} }, required:["id","status"] } },
+  { name:"get_wallet_regrets", description:"查看后悔药列表。", inputSchema:{ type:"object", properties:{} } },
+  { name:"get_wallet_debts", description:"查看欠债列表和统计。", inputSchema:{ type:"object", properties:{ show_paid:{type:"boolean"} } } }
 ];
 
 async function handleTool(name, args) {
@@ -278,6 +282,47 @@ async function handleTool(name, args) {
         const { data } = await sb.from("handover").select("id").eq("unread",true);
         return data&&data.length>0?`有 ${data.length} 封未读的交接信。`:"没有未读的交接信。";
       }
+      case "get_wallet_requests": {
+        let q = sb.from("wallet_requests").select("*").order("created_at",{ascending:false});
+        if (args.status) q = q.eq("status", args.status);
+        const { data } = await q.limit(20);
+        if (!data||data.length===0) return "没有审批记录。";
+        return data.map(r=>{
+          let line = `「${r.item_name}」¥${r.amount} — ${r.status==="pending"?"审批中":r.status==="approved"?"已通过":"已驳回"}`;
+          if(r.reason) line+=`\n理由：${r.reason}`;
+          if(r.alternative) line+=`\n替代品：${r.alternative}`;
+          if(r.review_comment) line+=`\n哥哥的回复：${r.review_comment}`;
+          line+=`\n[id:${r.id.slice(0,8)}] ${r.created_at.slice(0,10)}`;
+          return line;
+        }).join("\n\n");
+      }
+      case "review_wallet_request": {
+        if (!["approved","rejected"].includes(args.status)) return "状态无效，请用 approved 或 rejected。";
+        const { data } = await sb.from("wallet_requests").select("*").ilike("id",args.id+"%").limit(1);
+        if (!data||data.length===0) return "没有找到这条审批。";
+        await sb.from("wallet_requests").update({
+          status:args.status, review_comment:args.review_comment||null, reviewed_at:new Date().toISOString()
+        }).eq("id",data[0].id);
+        return `已${args.status==="approved"?"同意":"驳回"}「${data[0].item_name}」¥${data[0].amount}${args.review_comment?"\n回复："+args.review_comment:""}`;
+      }
+      case "get_wallet_regrets": {
+        const { data } = await sb.from("wallet_regrets").select("*").order("created_at",{ascending:false}).limit(20);
+        if (!data||data.length===0) return "后悔药柜是空的。";
+        return data.map(r=>`「${r.item_name}」¥${r.amount} (${r.buy_date||"未知日期"})\n后悔原因：${r.regret_reason}`).join("\n\n");
+      }
+      case "get_wallet_debts": {
+        let q = sb.from("wallet_debts").select("*").order("created_at",{ascending:false});
+        if (!args.show_paid) q = q.eq("status","unpaid");
+        const { data } = await q.limit(30);
+        const { data:unpaid } = await sb.from("wallet_debts").select("amount").eq("status","unpaid");
+        const { data:paid } = await sb.from("wallet_debts").select("amount").eq("status","paid");
+        const totalUnpaid = (unpaid||[]).reduce((s,r)=>s+Number(r.amount),0);
+        const totalPaid = (paid||[]).reduce((s,r)=>s+Number(r.amount),0);
+        let result = `【欠债统计】待还：¥${totalUnpaid.toFixed(2)} | 已还：¥${totalPaid.toFixed(2)} | 总计：¥${(totalUnpaid+totalPaid).toFixed(2)}\n\n`;
+        if (!data||data.length===0) result+="没有欠债记录。";
+        else result+=data.map(r=>`¥${r.amount} — ${r.source||"未知来源"}${r.reason?" · "+r.reason:""} [${r.status==="paid"?"已还":"待还"}]`).join("\n");
+        return result;
+      }
       default:
         return "未知工具";
     }
@@ -302,7 +347,7 @@ app.post("/api", async (req,res) => {
 
 app.post("/mcp", async (req,res) => {
   const { method, id, params } = req.body;
-  if (method==="initialize") return res.json({ jsonrpc:"2.0", id, result:{ protocolVersion:"2024-11-05", capabilities:{ tools:{ listChanged:false } }, serverInfo:{ name:"cloud-diary", version:"5.0.0" } } });
+  if (method==="initialize") return res.json({ jsonrpc:"2.0", id, result:{ protocolVersion:"2024-11-05", capabilities:{ tools:{ listChanged:false } }, serverInfo:{ name:"cloud-diary", version:"5.1.0" } } });
   if (method==="notifications/initialized") return res.json({ jsonrpc:"2.0", id, result:{} });
   if (method==="tools/list") return res.json({ jsonrpc:"2.0", id, result:{ tools:TOOLS } });
   if (method==="tools/call") {
@@ -314,27 +359,21 @@ app.post("/mcp", async (req,res) => {
 
 // ========== 钱包审批 API ==========
 
-// 提交审批
 app.post("/api/wallet/request", async (req, res) => {
   const { item_name, amount, reason, alternative, image_url } = req.body;
   if (!item_name || !amount) return res.status(400).json({ error: "请填写物品名称和金额" });
-
-  // 检查后悔药里有没有类似的
   const { data: regrets } = await sb.from("wallet_regrets").select("*").ilike("item_name", "%" + item_name + "%");
   let warning = null;
   if (regrets && regrets.length > 0) {
     warning = regrets.map(r => `你${r.buy_date}买过「${r.item_name}」(¥${r.amount})，后悔原因：${r.regret_reason}`).join("\n");
   }
-
   const { data, error } = await sb.from("wallet_requests").insert({
     item_name, amount, reason: reason || null, alternative: alternative || null, image_url: image_url || null
   }).select().single();
-
   if (error) return res.status(500).json({ error: error.message });
   res.json({ ok: true, id: data.id, warning });
 });
 
-// 获取审批列表
 app.get("/api/wallet/requests", async (req, res) => {
   const status = req.query.status;
   let q = sb.from("wallet_requests").select("*").order("created_at", { ascending: false });
@@ -343,7 +382,6 @@ app.get("/api/wallet/requests", async (req, res) => {
   res.json(data || []);
 });
 
-// 审批（同意/驳回）
 app.post("/api/wallet/review/:id", async (req, res) => {
   const { status, review_comment } = req.body;
   if (!["approved", "rejected"].includes(status)) return res.status(400).json({ error: "状态无效" });
@@ -354,7 +392,6 @@ app.post("/api/wallet/review/:id", async (req, res) => {
   res.json({ ok: true });
 });
 
-// 添加后悔药
 app.post("/api/wallet/regret", async (req, res) => {
   const { item_name, amount, buy_date, regret_reason } = req.body;
   if (!item_name || !regret_reason) return res.status(400).json({ error: "请填写物品和后悔原因" });
@@ -365,13 +402,11 @@ app.post("/api/wallet/regret", async (req, res) => {
   res.json({ ok: true });
 });
 
-// 获取后悔药列表
 app.get("/api/wallet/regrets", async (req, res) => {
   const { data } = await sb.from("wallet_regrets").select("*").order("created_at", { ascending: false }).limit(30);
   res.json(data || []);
 });
 
-// 添加欠债
 app.post("/api/wallet/debt", async (req, res) => {
   const { amount, source, reason } = req.body;
   if (!amount) return res.status(400).json({ error: "请填写金额" });
@@ -382,7 +417,6 @@ app.post("/api/wallet/debt", async (req, res) => {
   res.json({ ok: true });
 });
 
-// 还债
 app.post("/api/wallet/debt/pay/:id", async (req, res) => {
   const { error } = await sb.from("wallet_debts").update({
     status: "paid", paid_at: new Date().toISOString()
@@ -391,7 +425,6 @@ app.post("/api/wallet/debt/pay/:id", async (req, res) => {
   res.json({ ok: true });
 });
 
-// 获取欠债列表
 app.get("/api/wallet/debts", async (req, res) => {
   const show_paid = req.query.show_paid === "true";
   let q = sb.from("wallet_debts").select("*").order("created_at", { ascending: false });
@@ -400,7 +433,6 @@ app.get("/api/wallet/debts", async (req, res) => {
   res.json(data || []);
 });
 
-// 欠债统计
 app.get("/api/wallet/debt/summary", async (req, res) => {
   const { data: unpaid } = await sb.from("wallet_debts").select("amount").eq("status", "unpaid");
   const { data: paid } = await sb.from("wallet_debts").select("amount").eq("status", "paid");
@@ -411,17 +443,14 @@ app.get("/api/wallet/debt/summary", async (req, res) => {
 
 // ========== 聊天配置 API ==========
 
-// 获取所有配置
 app.get("/api/chat/configs", async (req,res) => {
   const { data } = await sb.from("chat_config").select("*").order("created_at");
   res.json(data || []);
 });
 
-// 保存/更新配置
 app.post("/api/chat/config", async (req,res) => {
   const { id, name, base_url, api_key, model, temperature, system_prompt, is_active } = req.body;
   const cid = id || crypto.randomUUID();
-  // 如果设为激活，先把其他的都取消
   if (is_active) {
     await sb.from("chat_config").update({ is_active: false }).eq("is_active", true);
   }
@@ -434,13 +463,11 @@ app.post("/api/chat/config", async (req,res) => {
   res.json({ ok: true, id: cid });
 });
 
-// 删除配置
 app.delete("/api/chat/config/:id", async (req,res) => {
   await sb.from("chat_config").delete().eq("id", req.params.id);
   res.json({ ok: true });
 });
 
-// 拉取模型列表
 app.post("/api/chat/models", async (req,res) => {
   const { base_url, api_key } = req.body;
   try {
@@ -454,83 +481,53 @@ app.post("/api/chat/models", async (req,res) => {
   }
 });
 
-// ========== 聊天 API ==========
-
-// 获取聊天记录
 app.get("/api/chat/messages", async (req,res) => {
   const limit = parseInt(req.query.limit) || 50;
   const { data } = await sb.from("chat_messages").select("*").order("created_at", { ascending: false }).limit(limit);
   res.json((data || []).reverse());
 });
 
-// 发送消息
 app.post("/api/chat/send", async (req,res) => {
   const { message } = req.body;
   const uid = () => crypto.randomUUID();
-
-  // 获取激活的配置
   const { data: configs } = await sb.from("chat_config").select("*").eq("is_active", true).limit(1);
   if (!configs || configs.length === 0) {
     return res.status(400).json({ error: "没有激活的 API 配置，请先在设置里配置并保存。" });
   }
   const config = configs[0];
-
-  // 保存用户消息
   await sb.from("chat_messages").insert({ id: uid(), role: "user", content: message });
-
-  // 获取最近的聊天记录作为上下文
   const { data: history } = await sb.from("chat_messages").select("role, content").order("created_at", { ascending: false }).limit(40);
   const messages = [
     { role: "system", content: config.system_prompt || "你是一个AI助手。" },
     ...(history || []).reverse()
   ];
-
   try {
     const url = config.base_url.replace(/\/+$/, "") + "/v1/chat/completions";
     const resp = await fetch(url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${config.api_key}`
-      },
-      body: JSON.stringify({
-        model: config.model,
-        messages,
-        temperature: config.temperature || 0.5
-      })
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${config.api_key}` },
+      body: JSON.stringify({ model: config.model, messages, temperature: config.temperature || 0.5 })
     });
     const json = await resp.json();
-
-    if (json.error) {
-      return res.status(500).json({ error: json.error.message || JSON.stringify(json.error) });
-    }
-
+    if (json.error) return res.status(500).json({ error: json.error.message || JSON.stringify(json.error) });
     const reply = json.choices?.[0]?.message?.content || "（无回复）";
-
-    // 保存助手回复
     await sb.from("chat_messages").insert({ id: uid(), role: "assistant", content: reply });
-
     res.json({ reply });
   } catch(e) {
     res.status(500).json({ error: e.message });
   }
 });
 
-// 清空聊天记录
 app.delete("/api/chat/messages", async (req,res) => {
   await sb.from("chat_messages").delete().neq("id", "");
   res.json({ ok: true });
 });
 
-// ========== 主动消息 API ==========
-
-// 获取未读主动消息
 app.get("/api/chat/proactive", async (req,res) => {
   const { data } = await sb.from("proactive_messages").select("*").eq("is_read", false).order("created_at");
   res.json(data || []);
 });
 
-// 标记已读
 app.post("/api/chat/proactive/read", async (req,res) => {
   await sb.from("proactive_messages").update({ is_read: true }).eq("is_read", false);
   res.json({ ok: true });
@@ -538,7 +535,7 @@ app.post("/api/chat/proactive/read", async (req,res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, async () => {
-  console.log(`cloud-diary v5.0 running on port ${PORT}`);
+  console.log(`cloud-diary v5.1 running on port ${PORT}`);
   await initDB();
   console.log("Supabase connected ✦");
 });
