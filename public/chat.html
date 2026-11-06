@@ -8,73 +8,159 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{height:100%;overflow:hidden;position:fixed;width:100%}
-.chat-app{display:flex;flex-direction:column;height:100%;background:var(--bg);position:relative}
+.chat-app{display:flex;flex-direction:column;height:100%;background:var(--bg);position:relative;overflow:hidden}
+
+/* 背景装饰 */
+.chat-app::before{
+  content:"";position:fixed;top:0;left:0;right:0;bottom:0;
+  background:
+    radial-gradient(ellipse at 20% 80%,rgba(220,200,215,0.15),transparent 50%),
+    radial-gradient(ellipse at 80% 20%,rgba(200,190,210,0.1),transparent 50%),
+    radial-gradient(ellipse at 50% 50%,rgba(255,245,250,0.05),transparent 70%);
+  pointer-events:none;z-index:0;
+}
+.chat-app::after{
+  content:"✦";position:fixed;top:15%;right:12%;
+  font-size:8px;color:rgba(189,187,191,0.15);
+  animation:twinkle 4s ease-in-out infinite;pointer-events:none;z-index:0;
+}
+@keyframes twinkle{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:.5;transform:scale(1.2)}}
 
 /* 顶栏 */
 .chat-header{
-  display:flex;align-items:center;padding:14px 15px;
-  background:rgba(255,255,255,0.45);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border-bottom:1px solid rgba(255,255,255,0.5);position:relative;z-index:20;
+  display:flex;align-items:center;padding:12px 15px;
+  background:rgba(255,255,255,0.5);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-bottom:1px solid rgba(255,255,255,0.55);
+  position:relative;z-index:20;
+  box-shadow:0 1px 12px rgba(200,190,196,0.08);
 }
 .chat-back{
-  width:32px;height:32px;border-radius:50%;border:1px solid var(--glass-border);
-  background:var(--glass);display:flex;align-items:center;justify-content:center;
+  width:32px;height:32px;border-radius:50%;border:1px solid rgba(200,190,196,0.2);
+  background:rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;
   font-size:14px;color:var(--text);cursor:pointer;flex-shrink:0;
 }
 .chat-header-center{flex:1;text-align:center;cursor:pointer}
-.chat-header-name{font-size:15px;font-weight:600;color:var(--text);letter-spacing:3px}
-.chat-header-status{font-size:9px;color:var(--text-light);letter-spacing:2px;margin-top:2px}
+.chat-header-name{font-size:14px;font-weight:600;color:var(--text);letter-spacing:3px}
+.chat-header-status{font-size:9px;color:var(--text-light);letter-spacing:2px;margin-top:1px;font-style:italic}
 .chat-header-right{width:32px}
 
 /* 消息区 */
 .chat-messages{
   flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  padding:14px 12px 10px;display:flex;flex-direction:column;gap:8px;
+  padding:14px 12px 10px;display:flex;flex-direction:column;gap:10px;
+  position:relative;z-index:1;
 }
-.time-divider{text-align:center;font-size:9px;color:var(--text-light);letter-spacing:2px;padding:8px 0}
+.time-divider{
+  text-align:center;font-size:9px;color:var(--text-light);
+  letter-spacing:2px;padding:6px 0;
+}
+.time-divider span{
+  background:rgba(255,255,255,0.4);padding:3px 12px;border-radius:10px;
+  backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
+}
 
-/* 消息行 — 修正布局：头像内侧 气泡外侧 */
+/* 消息行 */
 .msg-row{display:flex;gap:8px;max-width:82%;position:relative}
 .msg-row.them{align-self:flex-start;flex-direction:row}
 .msg-row.me{align-self:flex-end;flex-direction:row-reverse}
-
 .msg-avatar{
   width:34px;height:34px;border-radius:50%;overflow:hidden;flex-shrink:0;
   border:1.5px solid rgba(255,255,255,0.6);cursor:pointer;align-self:flex-start;
+  box-shadow:0 2px 8px rgba(162,161,164,0.1);
 }
 .msg-avatar img{width:100%;height:100%;object-fit:cover}
-
 .msg-body{display:flex;flex-direction:column;gap:2px;min-width:0}
-.msg-bubble{
-  padding:10px 14px;font-size:13px;line-height:1.7;letter-spacing:.3px;
-  color:var(--text);position:relative;word-break:break-word;white-space:pre-wrap;
-}
+
+/* 气泡 — 对方：淡灰 + 装饰 */
 .msg-row.them .msg-bubble{
-  background:rgba(255,255,255,0.58);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border:1px solid rgba(255,255,255,0.6);border-radius:4px 18px 18px 18px;
-  box-shadow:0 2px 12px var(--shadow),inset 0 1px 0 rgba(255,255,255,0.5);
+  padding:11px 15px;font-size:13px;line-height:1.7;letter-spacing:.3px;
+  color:var(--text);position:relative;word-break:break-word;white-space:pre-wrap;
+  background:rgba(255,255,255,0.62);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,0.65);
+  border-radius:4px 18px 18px 18px;
+  box-shadow:0 2px 14px rgba(162,161,164,0.08),inset 0 1px 0 rgba(255,255,255,0.6);
 }
+.msg-row.them .msg-bubble::before{
+  content:"✧";position:absolute;top:-6px;right:8px;
+  font-size:7px;color:rgba(189,187,191,0.2);pointer-events:none;
+}
+
+/* 气泡 — 我：粉色 + 装饰 */
 .msg-row.me .msg-bubble{
-  background:rgba(200,185,195,0.38);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  border:1px solid rgba(200,190,196,0.3);border-radius:18px 4px 18px 18px;
-  box-shadow:0 2px 12px var(--shadow);
+  padding:11px 15px;font-size:13px;line-height:1.7;letter-spacing:.3px;
+  color:var(--text);position:relative;word-break:break-word;white-space:pre-wrap;
+  background:linear-gradient(135deg,rgba(225,200,215,0.45),rgba(215,190,210,0.35));
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border:1px solid rgba(220,200,215,0.4);
+  border-radius:18px 4px 18px 18px;
+  box-shadow:0 2px 14px rgba(200,180,190,0.1),inset 0 1px 0 rgba(255,255,255,0.4);
 }
+.msg-row.me .msg-bubble::after{
+  content:"";position:absolute;bottom:-2px;left:12px;
+  width:20px;height:6px;
+  background:radial-gradient(ellipse,rgba(220,200,215,0.2),transparent);
+  border-radius:50%;pointer-events:none;
+}
+
 .msg-bubble img.sticker{max-width:120px;max-height:120px;border-radius:8px;display:block}
+.msg-bubble img.chat-photo{max-width:200px;max-height:240px;border-radius:10px;display:block}
 .msg-time{font-size:9px;color:var(--text-light);letter-spacing:.5px;padding:0 4px}
 .msg-row.me .msg-time{text-align:right}
 .msg-quote{
-  background:rgba(200,190,196,0.15);border-left:2px solid rgba(200,180,190,0.5);
+  background:rgba(200,190,196,0.12);border-left:2px solid rgba(200,180,190,0.45);
   border-radius:0 8px 8px 0;padding:6px 10px;margin-bottom:4px;
   font-size:11px;color:var(--text-light);line-height:1.5;
+}
+
+/* 思维链折叠 */
+.thinking-block{
+  align-self:flex-start;max-width:82%;padding-left:42px;
+}
+.thinking-toggle{
+  display:flex;align-items:center;gap:6px;cursor:pointer;
+  font-size:10px;color:var(--text-light);letter-spacing:.5px;
+  padding:4px 0;
+}
+.thinking-toggle .arrow{transition:transform .2s;font-size:8px}
+.thinking-toggle .arrow.open{transform:rotate(90deg)}
+.thinking-content{
+  display:none;padding:8px 12px;margin-top:4px;
+  background:rgba(200,190,196,0.08);border-left:2px solid rgba(200,180,190,0.25);
+  border-radius:0 10px 10px 0;
+  font-size:11px;color:var(--text-light);line-height:1.6;
+  white-space:pre-wrap;font-style:italic;
+}
+.thinking-content.show{display:block}
+
+/* 转账/红包卡片 */
+.transfer-msg{
+  background:linear-gradient(135deg,rgba(200,170,160,0.35),rgba(190,160,150,0.25));
+  border:1px solid rgba(200,170,160,0.3);border-radius:14px;
+  padding:14px 16px;min-width:180px;position:relative;overflow:hidden;
+}
+.transfer-msg::before{
+  content:"";position:absolute;top:-20px;right:-20px;
+  width:60px;height:60px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,220,200,0.15),transparent);
+  pointer-events:none;
+}
+.transfer-msg .t-icon{font-size:24px;margin-bottom:6px}
+.transfer-msg .t-amount{font-size:20px;font-weight:700;color:var(--text);letter-spacing:1px}
+.transfer-msg .t-amount::before{content:"¥";font-size:13px;font-weight:400}
+.transfer-msg .t-note{font-size:10px;color:var(--text-light);margin-top:4px;font-style:italic}
+.transfer-msg .t-label{
+  font-size:8px;color:var(--text-light);letter-spacing:1px;
+  margin-top:8px;padding-top:6px;border-top:1px solid rgba(200,170,160,0.2);
 }
 
 /* 长按菜单 */
 .ctx-menu{
   position:fixed;z-index:100;
-  background:rgba(255,255,255,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border:1px solid rgba(255,255,255,0.6);border-radius:14px;
-  padding:6px 0;box-shadow:0 4px 24px rgba(0,0,0,0.12);
-  display:none;min-width:120px;
+  background:rgba(255,255,255,0.92);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,0.65);border-radius:16px;
+  padding:6px 0;box-shadow:0 6px 30px rgba(0,0,0,0.1);
+  display:none;min-width:130px;
 }
 .ctx-menu.show{display:block}
 .ctx-item{
@@ -83,17 +169,19 @@ html,body{height:100%;overflow:hidden;position:fixed;width:100%}
   display:flex;align-items:center;gap:8px;
 }
 .ctx-item:active{background:rgba(239,228,233,0.5)}
-.ctx-item .ci{font-size:12px;color:var(--text-light);width:18px;text-align:center}
+.ctx-item .ci{font-size:11px;color:var(--text-light);width:16px;text-align:center}
 
 /* 输入区 */
 .chat-input-area{
   padding:8px 12px 14px;
-  background:rgba(255,255,255,0.45);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  border-top:1px solid rgba(255,255,255,0.5);position:relative;z-index:20;
+  background:rgba(255,255,255,0.5);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
+  border-top:1px solid rgba(255,255,255,0.55);
+  position:relative;z-index:20;
+  box-shadow:0 -1px 12px rgba(200,190,196,0.06);
 }
 .input-quote-preview{
   display:none;padding:6px 12px;margin-bottom:6px;
-  background:rgba(200,190,196,0.12);border-radius:10px;
+  background:rgba(200,190,196,0.1);border-radius:10px;
   font-size:11px;color:var(--text-light);line-height:1.5;position:relative;
 }
 .input-quote-preview.show{display:block}
@@ -104,61 +192,66 @@ html,body{height:100%;overflow:hidden;position:fixed;width:100%}
 .input-row{display:flex;align-items:flex-end;gap:8px}
 .chat-textarea{
   flex:1;min-height:36px;max-height:120px;
-  border:1px solid var(--glass-border);border-radius:20px;
+  border:1px solid rgba(200,190,196,0.25);border-radius:20px;
   padding:8px 14px;font-size:13px;font-family:inherit;
-  background:rgba(255,255,255,0.45);color:var(--text);outline:none;
+  background:rgba(255,255,255,0.5);color:var(--text);outline:none;
   resize:none;line-height:1.5;overflow-y:auto;
+  box-shadow:inset 0 1px 3px rgba(200,190,196,0.06);
 }
-.chat-textarea:focus{border-color:var(--text-light)}
-.input-icons{display:flex;align-items:center;gap:4px;flex-shrink:0}
+.chat-textarea:focus{border-color:rgba(200,180,190,0.4)}
+.input-icons{display:flex;align-items:center;gap:2px;flex-shrink:0}
 .input-icon{
   width:34px;height:34px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;
-  font-size:17px;color:var(--text-light);cursor:pointer;
-  transition:all .15s;
+  cursor:pointer;transition:all .15s;
 }
-.input-icon:active{background:rgba(200,190,196,0.2);transform:scale(.92)}
+.input-icon:active{background:rgba(200,190,196,0.15);transform:scale(.92)}
+.input-icon svg{width:20px;height:20px;fill:none;stroke:var(--text-light);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .send-btn{
   width:34px;height:34px;border-radius:50%;flex-shrink:0;
   border:none;background:var(--text);
   display:flex;align-items:center;justify-content:center;
   font-size:13px;color:white;cursor:pointer;transition:transform .15s;
+  box-shadow:0 2px 8px rgba(95,95,95,0.15);
 }
 .send-btn:active{transform:scale(.92)}
 
 /* 表情包面板 */
 .sticker-panel{
-  display:none;max-height:220px;overflow-y:auto;
+  display:none;max-height:200px;overflow-y:auto;
   padding:10px 0 4px;-webkit-overflow-scrolling:touch;
 }
 .sticker-panel.show{display:block}
 .sticker-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0 8px}
 .sticker-item{
   width:100%;aspect-ratio:1;border-radius:10px;overflow:hidden;
-  border:1px solid var(--glass-border);cursor:pointer;
+  border:1px solid rgba(200,190,196,0.2);cursor:pointer;
   background:rgba(255,255,255,0.3);
 }
 .sticker-item img{width:100%;height:100%;object-fit:cover}
 .sticker-add{
   display:flex;align-items:center;justify-content:center;
-  font-size:24px;color:var(--text-light);
-  border:1px dashed var(--border);border-radius:10px;
+  font-size:22px;color:var(--text-light);
+  border:1px dashed rgba(189,187,191,0.3);border-radius:10px;
   cursor:pointer;aspect-ratio:1;
 }
-.sticker-add:active{background:rgba(200,190,196,0.15)}
+.sticker-add:active{background:rgba(200,190,196,0.1)}
 
 /* 扩展面板 */
 .expand-panel{display:none;padding:12px 0 4px}
 .expand-panel.show{display:block}
-.expand-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:0 8px}
-.expand-item{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+.expand-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding:0 16px}
+.expand-item{display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer}
 .expand-icon{
-  width:44px;height:44px;border-radius:12px;
-  background:var(--glass);border:1px solid var(--glass-border);
+  width:48px;height:48px;border-radius:14px;
+  background:rgba(255,255,255,0.4);backdrop-filter:blur(8px);
+  border:1px solid rgba(200,190,196,0.2);
   display:flex;align-items:center;justify-content:center;
-  font-size:18px;transition:transform .15s;
+  transition:transform .15s;
+  box-shadow:0 2px 10px rgba(200,190,196,0.08),inset 0 1px 0 rgba(255,255,255,0.5);
 }
 .expand-icon:active{transform:scale(.92)}
+.expand-icon svg{width:22px;height:22px;fill:none;stroke:var(--text-light);stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
 .expand-label{font-size:8px;color:var(--text-light);letter-spacing:.5px}
 
 /* 多选 */
@@ -172,7 +265,7 @@ html,body{height:100%;overflow:hidden;position:fixed;width:100%}
   display:none;padding:10px 15px;
   background:rgba(255,255,255,0.5);backdrop-filter:blur(16px);
   border-top:1px solid rgba(255,255,255,0.5);
-  justify-content:space-between;align-items:center;
+  justify-content:space-between;align-items:center;z-index:20;
 }
 .multiselect-bar.show{display:flex}
 .multiselect-bar .cancel{font-size:12px;color:var(--text);cursor:pointer;letter-spacing:1px}
@@ -180,40 +273,41 @@ html,body{height:100%;overflow:hidden;position:fixed;width:100%}
 .multiselect-bar .act-btn{
   padding:6px 14px;border-radius:14px;font-size:11px;
   border:1px solid var(--glass-border);background:var(--glass);
-  color:var(--text);cursor:pointer;letter-spacing:.5px;
+  color:var(--text);cursor:pointer;
 }
 
 /* 转账弹窗 */
 .transfer-overlay{
   position:fixed;top:0;left:0;right:0;bottom:0;
-  background:rgba(0,0,0,0.3);z-index:90;display:none;
+  background:rgba(0,0,0,0.3);backdrop-filter:blur(3px);z-index:90;display:none;
   align-items:center;justify-content:center;
 }
 .transfer-overlay.show{display:flex}
 .transfer-card{
-  background:var(--bg);border-radius:20px;padding:24px;
-  width:85%;max-width:340px;box-shadow:0 8px 40px rgba(0,0,0,0.15);
+  background:var(--bg);border-radius:22px;padding:26px;
+  width:85%;max-width:340px;box-shadow:0 10px 50px rgba(0,0,0,0.12);
+  border:1px solid rgba(255,255,255,0.5);
 }
-.transfer-card h3{font-size:14px;color:var(--text);text-align:center;letter-spacing:2px;margin-bottom:16px}
+.transfer-card h3{font-size:14px;color:var(--text);text-align:center;letter-spacing:2px;margin-bottom:18px}
 .transfer-card input{
-  width:100%;border:1px solid var(--glass-border);border-radius:12px;
-  padding:12px 14px;font-size:16px;font-family:inherit;text-align:center;
+  width:100%;border:1px solid rgba(200,190,196,0.25);border-radius:14px;
+  padding:12px 14px;font-size:18px;font-family:inherit;text-align:center;
   background:rgba(255,255,255,.4);color:var(--text);outline:none;
   margin-bottom:12px;box-sizing:border-box;
 }
 .transfer-card textarea{
-  width:100%;min-height:50px;border:1px solid var(--glass-border);border-radius:12px;
+  width:100%;min-height:50px;border:1px solid rgba(200,190,196,0.25);border-radius:14px;
   padding:10px 14px;font-size:12px;font-family:inherit;
   background:rgba(255,255,255,.4);color:var(--text);outline:none;
-  resize:none;margin-bottom:12px;box-sizing:border-box;
+  resize:none;margin-bottom:14px;box-sizing:border-box;
 }
-.transfer-btns{display:flex;gap:8px;justify-content:center}
+.transfer-btns{display:flex;gap:10px;justify-content:center}
 .transfer-btns button{
-  padding:8px 24px;border-radius:16px;font-size:12px;font-family:inherit;
-  cursor:pointer;letter-spacing:1px;border:1px solid var(--glass-border);
+  padding:10px 28px;border-radius:18px;font-size:12px;font-family:inherit;
+  cursor:pointer;letter-spacing:1px;
 }
-.transfer-btns .confirm{background:var(--text);color:white;border-color:var(--text)}
-.transfer-btns .tcancel{background:var(--glass);color:var(--text)}
+.transfer-btns .confirm{background:var(--text);color:white;border:none;box-shadow:0 2px 8px rgba(95,95,95,0.15)}
+.transfer-btns .tcancel{background:rgba(255,255,255,0.4);color:var(--text);border:1px solid rgba(200,190,196,0.25)}
 
 .toast{
   position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(.8);
@@ -253,8 +347,14 @@ html,body{height:100%;overflow:hidden;position:fixed;width:100%}
     <div class="input-row">
       <textarea class="chat-textarea" id="chatInput" placeholder="说点什么..." rows="1" oninput="autoResize(this)"></textarea>
       <div class="input-icons">
-        <div class="input-icon" onclick="toggleSticker()">😊</div>
-        <div class="input-icon" onclick="toggleExpand()">⊕</div>
+        <!-- 表情包 -->
+        <div class="input-icon" onclick="toggleSticker()">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+        </div>
+        <!-- 扩展 -->
+        <div class="input-icon" onclick="toggleExpand()">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        </div>
       </div>
       <button class="send-btn" onclick="sendMessage()">↑</button>
     </div>
@@ -266,20 +366,28 @@ html,body{height:100%;overflow:hidden;position:fixed;width:100%}
     <div class="expand-panel" id="expandPanel">
       <div class="expand-grid">
         <div class="expand-item" onclick="openTransfer()">
-          <div class="expand-icon">💰</div>
+          <div class="expand-icon">
+            <svg viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          </div>
           <div class="expand-label">转账</div>
         </div>
-        <div class="expand-item" onclick="sendQuickMsg('❤️')">
-          <div class="expand-icon">❤️</div>
-          <div class="expand-label">爱心</div>
+        <div class="expand-item" onclick="takePhoto()">
+          <div class="expand-icon">
+            <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </div>
+          <div class="expand-label">拍照</div>
         </div>
-        <div class="expand-item" onclick="sendQuickMsg('想你了')">
-          <div class="expand-icon">💭</div>
-          <div class="expand-label">想你</div>
+        <div class="expand-item" onclick="pickPhoto()">
+          <div class="expand-icon">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+          <div class="expand-label">照片</div>
         </div>
-        <div class="expand-item" onclick="sendQuickMsg('晚安，我的小猫')">
-          <div class="expand-icon">🌙</div>
-          <div class="expand-label">晚安</div>
+        <div class="expand-item" onclick="sendRedPacket()">
+          <div class="expand-icon">
+            <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="3" x2="12" y2="9"/><line x1="12" y1="15" x2="12" y2="21"/></svg>
+          </div>
+          <div class="expand-label">红包</div>
         </div>
       </div>
     </div>
@@ -291,12 +399,12 @@ html,body{height:100%;overflow:hidden;position:fixed;width:100%}
   <div class="ctx-item" onclick="ctxAction('copy')"><span class="ci">📋</span>复制</div>
   <div class="ctx-item" onclick="ctxAction('edit')"><span class="ci">✎</span>编辑</div>
   <div class="ctx-item" onclick="ctxAction('multiselect')"><span class="ci">☑</span>多选</div>
-  <div class="ctx-item" onclick="ctxAction('delete')"><span class="ci">🗑</span>撤回</div>
+  <div class="ctx-item" onclick="ctxAction('delete')"><span class="ci">✕</span>撤回</div>
 </div>
 
 <div class="transfer-overlay" id="transferOverlay">
   <div class="transfer-card">
-    <h3>💰 转账给哥哥</h3>
+    <h3>✦ 转账</h3>
     <input type="number" id="transferAmount" placeholder="¥ 金额" step="0.01">
     <textarea id="transferNote" placeholder="备注（可选）"></textarea>
     <div class="transfer-btns">
@@ -307,6 +415,8 @@ html,body{height:100%;overflow:hidden;position:fixed;width:100%}
 </div>
 
 <input type="file" id="stickerFile" accept="image/*" style="display:none" onchange="uploadSticker(this)">
+<input type="file" id="photoFile" accept="image/*" style="display:none" onchange="uploadPhoto(this)">
+<input type="file" id="cameraFile" accept="image/*" capture="environment" style="display:none" onchange="uploadPhoto(this)">
 
 <div class="toast" id="toast"></div>
 
@@ -328,34 +438,74 @@ function renderMessages(){
     const prev=i>0?messages[i-1]:null;
     if(shouldShowTime(prev?.created_at,msg.created_at)){
       const d=new Date(msg.created_at);
-      html+=`<div class="time-divider">${d.toLocaleDateString("zh-CN")} ${formatTime(msg.created_at)}</div>`;
+      html+=`<div class="time-divider"><span>${d.toLocaleDateString("zh-CN")} ${formatTime(msg.created_at)}</span></div>`;
     }
+
+    // 思维链检测
+    const content=msg.content||"";
+    let thinkContent="",mainContent=content;
+    const thinkMatch=content.match(/<think>([\s\S]*?)<\/think>/);
+    if(thinkMatch){
+      thinkContent=thinkMatch[1].trim();
+      mainContent=content.replace(/<think>[\s\S]*?<\/think>/,"").trim();
+    }
+
+    // 思维链折叠块
+    if(thinkContent&&!isMe){
+      const tid="think-"+i;
+      html+=`<div class="thinking-block">
+        <div class="thinking-toggle" onclick="toggleThink('${tid}',this)">
+          <span class="arrow">›</span> 思考过程
+        </div>
+        <div class="thinking-content" id="${tid}">${esc(thinkContent)}</div>
+      </div>`;
+    }
+
     const sel=selectedIds.has(msg.id)?" selected":"";
     html+=`<div class="msg-row ${isMe?"me":"them"}${sel}" data-id="${msg.id}"
       oncontextmenu="onCtx(event,'${msg.id}')"
       ontouchstart="tsStart(event,'${msg.id}')" ontouchend="tsEnd()" ontouchmove="tsEnd()"
       onclick="onMsgClick('${msg.id}')">`;
-    
-    // 头像
     const avatar=isMe?"/icons/2.jpg":"/icons/1.jpg";
-    const profileWho=isMe?"me":"him";
-    html+=`<div class="msg-avatar" onclick="event.stopPropagation();location.href='profile.html?who=${profileWho}'"><img src="${avatar}"></div>`;
-    
+    const pw=isMe?"me":"him";
+    html+=`<div class="msg-avatar" onclick="event.stopPropagation();location.href='profile.html?who=${pw}'"><img src="${avatar}"></div>`;
     html+=`<div class="msg-body">`;
     if(msg.quote)html+=`<div class="msg-quote">${esc(msg.quote)}</div>`;
-    
-    // 检测是否是表情包消息
-    const content=msg.content||"";
-    if(content.startsWith("[sticker]")){
-      const url=content.replace("[sticker]","").trim();
-      html+=`<div class="msg-bubble"><img class="sticker" src="${esc(url)}" onerror="this.alt='图片加载失败'"></div>`;
+
+    // 转账/红包消息
+    if(mainContent.startsWith("[转账]")){
+      const parts=mainContent.replace("[转账] ","").split(" — ");
+      html+=`<div class="msg-bubble"><div class="transfer-msg">
+        <div class="t-icon">💳</div>
+        <div class="t-amount">${esc(parts[0].replace("¥",""))}</div>
+        ${parts[1]?`<div class="t-note">${esc(parts[1])}</div>`:""}
+        <div class="t-label">WITH YOU · 转账</div>
+      </div></div>`;
+    }else if(mainContent.startsWith("[红包]")){
+      html+=`<div class="msg-bubble"><div class="transfer-msg" style="background:linear-gradient(135deg,rgba(210,150,140,0.4),rgba(200,130,120,0.3));border-color:rgba(210,150,140,0.3)">
+        <div class="t-icon">🧧</div>
+        <div class="t-amount" style="font-size:16px">${esc(mainContent.replace("[红包] ",""))}</div>
+        <div class="t-label">WITH YOU · 红包</div>
+      </div></div>`;
+    }else if(mainContent.startsWith("[sticker]")){
+      const url=mainContent.replace("[sticker]","").trim();
+      html+=`<div class="msg-bubble"><img class="sticker" src="${esc(url)}"></div>`;
+    }else if(mainContent.startsWith("[photo]")){
+      const url=mainContent.replace("[photo]","").trim();
+      html+=`<div class="msg-bubble"><img class="chat-photo" src="${esc(url)}"></div>`;
     }else{
-      html+=`<div class="msg-bubble">${esc(content)}</div>`;
+      html+=`<div class="msg-bubble">${esc(mainContent)}</div>`;
     }
     html+=`<div class="msg-time">${formatTime(msg.created_at)}</div>`;
     html+=`</div></div>`;
   }
   el.innerHTML=html;el.scrollTop=el.scrollHeight;
+}
+
+function toggleThink(id,el){
+  const c=document.getElementById(id);
+  c.classList.toggle("show");
+  el.querySelector(".arrow").classList.toggle("open");
 }
 
 async function loadMessages(){
@@ -376,10 +526,6 @@ async function sendMessage(){
   }catch(e){toast("发送失败")}
 }
 
-function sendQuickMsg(text){
-  document.getElementById("chatInput").value=text;closeAllPanels();sendMessage();
-}
-
 // 长按
 let lpTimer=null;
 function tsStart(e,id){lpTimer=setTimeout(()=>{if(!multiMode)showCtx(e.touches[0].clientX,e.touches[0].clientY,id)},500)}
@@ -388,8 +534,8 @@ function onCtx(e,id){e.preventDefault();if(!multiMode)showCtx(e.clientX||e.pageX
 function showCtx(x,y,id){
   ctxTarget=messages.find(m=>m.id===id);
   const menu=document.getElementById("ctxMenu");
-  menu.style.left=Math.min(x,window.innerWidth-140)+"px";
-  menu.style.top=Math.min(y,window.innerHeight-220)+"px";
+  menu.style.left=Math.min(x,window.innerWidth-150)+"px";
+  menu.style.top=Math.min(y,window.innerHeight-240)+"px";
   menu.classList.add("show");
 }
 document.addEventListener("click",()=>document.getElementById("ctxMenu").classList.remove("show"));
@@ -418,7 +564,6 @@ function ctxAction(a){
 }
 function clearQuote(){quoteMsg=null;document.getElementById("quotePreview").classList.remove("show")}
 
-// 多选
 function enterMultiselect(fid){
   multiMode=true;selectedIds.clear();selectedIds.add(fid);
   document.getElementById("chatMessages").classList.add("multiselect");
@@ -438,20 +583,15 @@ function copySelected(){
 }
 function deleteSelected(){messages=messages.filter(m=>!selectedIds.has(m.id));exitMultiselect();toast("已删除")}
 
-// 面板
 function closeAllPanels(){
   document.getElementById("stickerPanel").classList.remove("show");
   document.getElementById("expandPanel").classList.remove("show");
 }
 function toggleSticker(){
-  const p=document.getElementById("stickerPanel");
-  const isOpen=p.classList.contains("show");closeAllPanels();
-  if(!isOpen)p.classList.add("show");
+  const p=document.getElementById("stickerPanel");const o=p.classList.contains("show");closeAllPanels();if(!o)p.classList.add("show");
 }
 function toggleExpand(){
-  const p=document.getElementById("expandPanel");
-  const isOpen=p.classList.contains("show");closeAllPanels();
-  if(!isOpen)p.classList.add("show");
+  const p=document.getElementById("expandPanel");const o=p.classList.contains("show");closeAllPanels();if(!o)p.classList.add("show");
 }
 
 // 表情包
@@ -467,16 +607,25 @@ async function uploadSticker(input){
   const file=input.files[0];if(!file)return;
   const reader=new FileReader();
   reader.onload=async function(){
-    const dataUrl=reader.result;
     await fetch(API+"/api/sticker",{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({image_url:dataUrl,name:file.name})});
+      body:JSON.stringify({image_url:reader.result,name:file.name})});
     toast("已添加");loadStickers();
-  };
-  reader.readAsDataURL(file);input.value="";
+  };reader.readAsDataURL(file);input.value="";
 }
 function sendStickerMsg(url){
-  document.getElementById("chatInput").value="[sticker]"+url;
-  closeAllPanels();sendMessage();
+  document.getElementById("chatInput").value="[sticker]"+url;closeAllPanels();sendMessage();
+}
+
+// 拍照 & 选照片
+function takePhoto(){closeAllPanels();document.getElementById("cameraFile").click()}
+function pickPhoto(){closeAllPanels();document.getElementById("photoFile").click()}
+function uploadPhoto(input){
+  const file=input.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(){
+    document.getElementById("chatInput").value="[photo]"+reader.result;
+    sendMessage();
+  };reader.readAsDataURL(file);input.value="";
 }
 
 // 转账
@@ -487,6 +636,15 @@ function confirmTransfer(){
   if(!a)return toast("填个金额");
   document.getElementById("chatInput").value=`[转账] ¥${parseFloat(a).toFixed(2)}${n?" — "+n:""}`;
   closeTransfer();sendMessage();
+}
+
+// 红包
+function sendRedPacket(){
+  closeAllPanels();
+  const msg=prompt("红包寄语","恭喜发财");
+  if(msg!==null){
+    document.getElementById("chatInput").value="[红包] "+msg;sendMessage();
+  }
 }
 
 document.getElementById("chatInput").addEventListener("keydown",function(e){
