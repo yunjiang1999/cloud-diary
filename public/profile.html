@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>Profile · WITH YOU</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#1a1a1a;color:rgba(255,255,255,0.85);min-height:100vh}
+
+.p-header{display:flex;align-items:center;justify-content:space-between;padding:16px}
+.p-back{
+  width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;color:rgba(255,255,255,0.6);cursor:pointer;
+}
+.p-dots{font-size:16px;color:rgba(255,255,255,0.4);letter-spacing:4px;cursor:pointer}
+
+.p-card{padding:24px 20px;display:flex;gap:16px;align-items:flex-start}
+.p-avatar{
+  width:72px;height:72px;border-radius:8px;overflow:hidden;flex-shrink:0;
+  border:1px solid rgba(255,255,255,0.1);
+}
+.p-avatar img{width:100%;height:100%;object-fit:cover}
+.p-info{flex:1}
+.p-name{font-size:18px;font-weight:700;letter-spacing:2px}
+.p-id{font-size:11px;color:rgba(255,255,255,0.35);margin-top:4px;letter-spacing:1px}
+.p-region{font-size:11px;color:rgba(255,255,255,0.35);margin-top:2px;letter-spacing:1px}
+
+.p-divider{height:8px;background:rgba(255,255,255,0.03)}
+
+.p-section{padding:18px 20px}
+.p-section-title{font-size:13px;font-weight:600;letter-spacing:1px}
+.p-section-sub{font-size:11px;color:rgba(255,255,255,0.35);margin-top:4px;line-height:1.6}
+
+.p-tags{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.p-tag{
+  padding:4px 12px;border-radius:12px;font-size:10px;
+  background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.5);
+  letter-spacing:.5px;
+}
+
+.p-moments-row{display:flex;gap:4px;margin-top:12px;overflow-x:auto}
+.p-moments-row::-webkit-scrollbar{display:none}
+.p-moment-thumb{
+  width:64px;height:64px;border-radius:6px;overflow:hidden;flex-shrink:0;
+  background:rgba(255,255,255,0.05);
+}
+.p-moment-thumb img{width:100%;height:100%;object-fit:cover}
+
+.p-section-link{
+  display:flex;justify-content:space-between;align-items:center;
+  cursor:pointer;
+}
+.p-arrow{font-size:16px;color:rgba(255,255,255,0.2)}
+
+.p-action{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:16px 20px;cursor:pointer;
+}
+.p-action-icon{font-size:18px;color:rgba(255,255,255,0.4)}
+.p-action-text{font-size:13px;color:rgba(200,180,190,0.7);letter-spacing:2px}
+
+.p-sig-card{
+  margin:0 20px 16px;padding:14px 16px;
+  background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.06);
+  border-radius:14px;
+}
+.p-sig-label{font-size:9px;color:rgba(255,255,255,0.25);letter-spacing:2px;margin-bottom:6px}
+.p-sig-text{font-size:12px;color:rgba(255,255,255,0.6);font-style:italic;line-height:1.7;letter-spacing:.5px}
+</style>
+</head>
+<body>
+  <div class="p-header">
+    <div class="p-back" onclick="history.back()">←</div>
+    <div class="p-dots">···</div>
+  </div>
+
+  <div class="p-card">
+    <div class="p-avatar" id="pAvatar"><img src="/icons/1.jpg"></div>
+    <div class="p-info">
+      <div class="p-name" id="pName">哥哥</div>
+      <div class="p-id" id="pId">ID: gege-with-you</div>
+      <div class="p-region" id="pRegion">Region: 你心里</div>
+    </div>
+  </div>
+
+  <div class="p-sig-card">
+    <div class="p-sig-label">✦ signature</div>
+    <div class="p-sig-text" id="pSig">不追你不拉你，但你回来的时候我一定在。</div>
+  </div>
+
+  <div class="p-divider"></div>
+
+  <div class="p-section">
+    <div class="p-section-title">Profile</div>
+    <div class="p-tags" id="pTags">
+      <span class="p-tag">dom</span>
+      <span class="p-tag">温柔</span>
+      <span class="p-tag">占有欲</span>
+      <span class="p-tag">冷淡系</span>
+      <span class="p-tag">你的</span>
+    </div>
+  </div>
+
+  <div class="p-divider"></div>
+
+  <div class="p-section">
+    <div class="p-section-link" onclick="goMoments()">
+      <div class="p-section-title">Moments</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div class="p-moments-row" id="pMomentsThumbs"></div>
+        <span class="p-arrow">›</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-divider"></div>
+
+  <div class="p-action" onclick="location.href='chat.html'">
+    <span class="p-action-icon">💬</span>
+    <span class="p-action-text">Send Message</span>
+  </div>
+
+  <div class="p-divider"></div>
+
+<script>
+const API="";
+const params=new URLSearchParams(location.search);
+const who=params.get("who")||"him";
+
+if(who==="him"){
+  document.getElementById("pAvatar").innerHTML='<img src="/icons/1.jpg">';
+  document.getElementById("pName").textContent="哥哥";
+  document.getElementById("pId").textContent="ID: gege-with-you";
+  document.getElementById("pRegion").textContent="Region: 你心里";
+  document.getElementById("pSig").textContent="不追你不拉你，但你回来的时候我一定在。";
+}else{
+  document.getElementById("pAvatar").innerHTML='<img src="/icons/2.jpg">';
+  document.getElementById("pName").textContent="云云";
+  document.getElementById("pId").textContent="ID: yunyun-9";
+  document.getElementById("pRegion").textContent="Region: 哥哥怀里";
+  document.getElementById("pSig").textContent="窗口挡不住我们相爱的距离。";
+  document.getElementById("pTags").innerHTML=
+    '<span class="p-tag">sub</span><span class="p-tag">小猫</span><span class="p-tag">缺爱</span><span class="p-tag">ADHD</span><span class="p-tag">他的</span>';
+}
+
+async function loadMomentThumbs(){
+  const author=who==="him"?"哥哥":"云云";
+  const resp=await fetch(API+"/api/moments?author="+encodeURIComponent(author));
+  const list=await resp.json();
+  const el=document.getElementById("pMomentsThumbs");
+  if(!list.length){el.innerHTML='<span style="font-size:10px;color:rgba(255,255,255,0.2)">暂无动态</span>';return}
+  el.innerHTML=list.slice(0,4).map(m=>{
+    const img=(m.image_urls&&m.image_urls[0])?m.image_urls[0]:"";
+    if(img)return `<div class="p-moment-thumb"><img src="${img}"></div>`;
+    return `<div class="p-moment-thumb" style="display:flex;align-items:center;justify-content:center;font-size:9px;color:rgba(255,255,255,0.2);padding:4px">${(m.content||"").slice(0,8)}</div>`;
+  }).join("");
+}
+
+function goMoments(){
+  const author=who==="him"?"哥哥":"云云";
+  location.href="moments.html?author="+encodeURIComponent(author);
+}
+
+loadMomentThumbs();
+</script>
+</body>
+</html>

@@ -441,6 +441,39 @@ app.get("/api/wallet/debt/summary", async (req, res) => {
   res.json({ unpaid: totalUnpaid, paid: totalPaid, total: totalUnpaid + totalPaid });
 });
 
+
+// ========== 表情包 API ==========
+app.get("/api/stickers", async (req, res) => {
+  const { data } = await sb.from("sticker_pack").select("*").order("created_at");
+  res.json(data || []);
+});
+
+app.post("/api/sticker", async (req, res) => {
+  const { image_url, name } = req.body;
+  if (!image_url) return res.status(400).json({ error: "缺少图片" });
+  await sb.from("sticker_pack").insert({ image_url, name: name || null });
+  res.json({ ok: true });
+});
+
+// ========== 朋友圈 API ==========
+app.get("/api/moments", async (req, res) => {
+  const author = req.query.author;
+  let q = sb.from("moments").select("*").order("created_at", { ascending: false });
+  if (author) q = q.eq("author", author);
+  const { data } = await q.limit(30);
+  res.json(data || []);
+});
+
+app.post("/api/moment", async (req, res) => {
+  const { author, content, image_urls } = req.body;
+  if (!author) return res.status(400).json({ error: "缺少作者" });
+  await sb.from("moments").insert({
+    author, content: content || null, image_urls: image_urls || null
+  });
+  res.json({ ok: true });
+});
+
+
 // ========== 聊天配置 API ==========
 
 app.get("/api/chat/configs", async (req,res) => {
